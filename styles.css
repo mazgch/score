@@ -14,7 +14,7 @@ h2 {
 }
 
 th,
-td,
+td, 
 input {
     height: 2em;
     width: 6em;
@@ -22,8 +22,7 @@ input {
     text-align: center;
 }
 
-input[type="text"],
-input[type="number"] {
+input {
     border: 2px solid black;;
     outline: none;
     width: 100%;
@@ -32,11 +31,15 @@ input[type="number"] {
     font-family: inherit;
     font-weight: inherit;
     font-size: inherit;
+    background: inherit;
 }
 
 th,
 tbody tr:nth-child(even) {
     background: #f4f4f4;
+}
+tbody td:first-child {
+    font-weight:bold;
 }
 
 @keyframes blink_input_opacity_to_prevent_scrolling_when_focus {
