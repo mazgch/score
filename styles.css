@@ -20,7 +20,7 @@ input {
 
 input[type="text"],
 input[type="number"] {
-    border: none;
+    border: 2px solid black;;
     outline: none;
     width: 100%;
     height: 100%;
@@ -28,11 +28,18 @@ input[type="number"] {
     font-family: inherit;
     font-weight: inherit;
     font-size: inherit;
-    color: blue;
-    background: lightblue;
 }
 
 th,
 tbody tr:nth-child(even) {
     background: #f4f4f4;
+}
+
+@keyframes blink_input_opacity_to_prevent_scrolling_when_focus {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.input--focused {
+    animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
 }
