@@ -18,6 +18,7 @@ window.onload = function _onload() {
         }
     });
     initChart();
+    makeCellEditable(scores.rows[0].children[1]);
 
     function makeCellEditable(cell) {
         const initialValue = cell.textContent;
@@ -34,28 +35,29 @@ window.onload = function _onload() {
             if ((e.key === 'Enter') || (e.key === 'Tab')) {
                 e.preventDefault();
                 input.blur();
-                let nextCell = cell.nextElementSibling;
-                if (!nextCell && input.type == "number") {
-                    const numRows = scores.rows.length;
-                    const newRow = scores.insertRow(0);
-                    for (let i = 0; i < table.rows[0].cells.length; i++) {
-                        const newCell = newRow.insertCell();
-                        newCell.textContent = '';
-                        if (i > 0) {
-                            newCell.setAttribute("edittype", "number");
+                if(input.value != "" && input.type == "number") {
+                    let nextCell = cell.nextElementSibling;
+                    if (!nextCell) {
+                        const numRows = scores.rows.length;
+                        const newRow = scores.insertRow(0);
+                        for (let i = 0; i < table.rows[0].cells.length; i++) {
+                            const newCell = newRow.insertCell();
+                            newCell.textContent = '';
+                            if (i > 0) {
+                                newCell.setAttribute("edittype", "number");
+                            }
                         }
+                        newRow.children[0].innerHTML = numRows;
+                        nextCell = newRow.children[1];
                     }
-                    newRow.children[0].innerHTML = numRows;
-                    nextCell = newRow.children[1];
-                }
-                if (nextCell) {
-                    makeCellEditable(nextCell);
+                    if (nextCell) {
+                        makeCellEditable(nextCell);
+                    }
                 }
                 updateScore();
             } else if (e.key === 'Escape') {
                 cell.textContent = initialValue;
             }
-
         });
     }
 
