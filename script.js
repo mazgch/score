@@ -1,78 +1,73 @@
 
-window.addEventListener("DOMContentLoaded",_loaded);
+"use strict";
 
-function _loaded( ) {
+window.onload = function _onload() {
 
-    let selected;
-    let players = 2;
+    const table = document.getElementById('table');
+    const scores = document.getElementById('scores');
+    const name = document.getElementById("name");
+    const score = document.getElementById("score");
     let chart;
-    let labels = [ ];
-    let datasets = [ ];
-
-    let name = document.getElementById("name");
-    let score = document.getElementById("score");
-    let input = document.getElementById("input");
-    let scores = document.getElementById("scores");
-                                            
-    window.onclick = function _losefocus(evt, cancel = true) {
-        if ((selected !== undefined) && (evt.target != selected)) {
-            selected.close(false);
+    let labels = [];
+    let datasets = [];
+    table.addEventListener('click', function (event) {
+        const cell = event.target;
+        if (cell.hasAttribute("edittype") &&
+            !cell.querySelector('input')) {
+            makeCellEditable(cell);
         }
-    }
+    });
+    initChart();
 
-    function _setup(cell) {
-        cell.onkeydown = function _keydown(evt) {
-            if ((evt.key=="Enter") || (evt.key=="Tab")) {
-                return this.close(true);
-            } else if (evt.key=="Escape") {
-                return this.close(false);
-            }
-        };
-        cell.close = function _close(ok) {
-            if (this.oldValue != undefined) {
-                if (! ok) {
-                    this.innerHTML = this.oldValue;
-                }
-                this.contentEditable = false;
-                this.oldValue = undefined;
-                
-                if((selected.parentNode == input) && ok && Number.isInteger(parseInt(this.innerHTML))) {
-                    if (selected.nextElementSibling) {
-                        selected.nextElementSibling.click();
-                    } else {
-                        let row = input.outerHTML;
-                        row = row.replaceAll("</th>", "</td>");
-                        row = row.replaceAll("<th", "<td");
-                        scores.innerHTML = row + scores.innerHTML;
-                        input.children[0].innerHTML = scores.childElementCount;
-                        for (let p = 1; p <= players; p ++) {
-                            let num = parseInt(input.children[p].innerHTML);
-                            if (!Number.isInteger(num)) num = 0; 
-                            score.children[p].innerHTML = num + parseInt(score.children[p].innerHTML);
-                            input.children[p].innerHTML = "";
+    function makeCellEditable(cell) {
+        const initialValue = cell.textContent;
+        cell.textContent = '';
+        const input = document.createElement('input');
+        input.type = cell.getAttribute("edittype");
+        input.value = initialValue;
+        cell.appendChild(input);
+        input.focus();
+        input.addEventListener('blur', function () {
+            cell.textContent = input.value || initialValue;
+        });
+        input.addEventListener('keydown', function (e) {
+            if ((e.key === 'Enter') || (e.key === 'Tab')) {
+                e.preventDefault();
+                input.blur();
+                let nextCell = cell.nextElementSibling;
+                if (!nextCell && input.type == "number") {
+                    const numRows = scores.rows.length;
+                    const newRow = scores.insertRow(0);
+                    for (let i = 0; i < table.rows[0].cells.length; i++) {
+                        const newCell = newRow.insertCell();
+                        newCell.textContent = '';
+                        if (i > 0) {
+                            newCell.setAttribute("edittype", "number");
                         }
-                        input.children[1].click();
                     }
-                    this.blur();
+                    newRow.children[0].innerHTML = numRows;
+                    nextCell = newRow.children[1];
                 }
-                updateChart();
-                return false;
+                if (nextCell) {
+                    makeCellEditable(nextCell);
+                }
+                updateScore();
+            } else if (e.key === 'Escape') {
+                cell.textContent = initialValue;
             }
-        }
-        cell.onclick = function _click(evt) { 
-            if (this.oldValue == undefined) {
-                this.oldValue = this.innerHTML;
-                this.contentEditable = true;
-                this.focus();
-                selected = this;
-            }
-        }
+
+        });
     }
 
     function initChart() {
         let ctx = document.getElementById('scoreChart').getContext('2d');
-        for (let p = 0; p < players; p ++) {
-            datasets[p] = { label: name.children[p+1].innerHTML, fill: false, tension: 0.1, data: [ 0 ] };
+        for (let p = 1; p < name.children.length; p++) {
+            datasets[p - 1] = {
+                label: name.children[p].innerHTML,
+                fill: false,
+                tension: 0.1,
+                data: [0]
+            };
         }
         chart = new Chart(ctx, {
             type: 'line',
@@ -80,36 +75,33 @@ function _loaded( ) {
                 labels: labels,
                 datasets: datasets
             },
-            options: { scales: {  x: { beginAtZero: true }, y: { beginAtZero: true } } }
-        } );
-    };
-    
-    function updateChart() {
+            options: { scales: { x: { beginAtZero: true }, y: { beginAtZero: true } } }
+        });
+    }
+
+    function updateScore() {
         let num = scores.childElementCount;
-        let sum = [ ];
-        for (let p = 0; p < players; p ++) {
-            sum[p] = 0;
-            datasets[p].label = name.children[p+1].innerHTML;
+        let sum = [];
+        for (let p = 1; p < name.children.length; p++) {
+            sum[p - 1] = 0;
+            datasets[p - 1].label = name.children[p].innerHTML;
         }
-        for (let s = 0; s <= num; s++) {
+        for (let s = 0; s < num; s++) {
             labels[s] = s;
-            for (let p = 0; p < players; p ++) {
-                let val = parseInt( ((s < num) ? scores.children[num-s-1] : input).children[p+1].innerHTML)
+            for (let p = 1; p < name.children.length; p++) {
+                let val = parseInt(((s < num) ? scores.children[num - s - 1] : input).children[p].innerHTML)
                 if (Number.isInteger(val)) {
-                    sum[p] += val;
-                    datasets[p].data[s] = sum[p];
-                } else { 
-                    datasets[p].data[s] = undefined;
+                    sum[p - 1] += val;
+                    datasets[p - 1].data[s] = sum[p - 1];
+                } else {
+                    datasets[p - 1].data[s] = undefined;
                 }
             }
         }
+        for (let p = 1; p < name.children.length; p++) {
+            score.children[p].innerHTML = sum[p - 1];
+        }
         chart.update();
-    };
-    
-    for (let cell of document.querySelectorAll(".editable")) {
-        _setup(cell);
     }
-    initChart();
-    input.children[1].click();
-};
 
+};

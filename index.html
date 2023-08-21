@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Board Game Counter</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
-    <div height="400px"><canvas id="scoreChart"></canvas></div>
-
-    <table>
-        <thead>
-            <tr id="name"><th>Player</th><th class="editable">Nicole</th><th class="editable">Michael</th></tr>
-            <tr id="score"><th>Score</th><th>0</th><th>0</th></tr>
-            <tr id="input"><th>0</th><th class="editable"></th><th class="editable"></th></tr>
-        </thead>
-        <tbody id="scores"></tbody>
-    </table>
-    <script src="script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Board Game Counter</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <h2>Board Game Counter</h2>
+        <div height="400px"><canvas id="scoreChart"></canvas></div>
+        <table id="table">
+            <thead>
+                <tr id="name">
+                    <th>Player</th>
+                    <th edittype="text">Nicole</th>
+                    <th edittype="text">Michael</th>
+                </tr>
+                <tr id="score">
+                    <th>Score</th>
+                    <th>0</th>
+                    <th>0</th>
+                </tr>
+            </thead>
+            <tbody id="scores">
+                <tr>
+                    <td>0</td>
+                    <td edittype="number"></td>
+                    <td edittype="number"></td>
+                </tr>
+            </tbody>
+        </table>
+        <script src="script.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+    </body>
 </html>
