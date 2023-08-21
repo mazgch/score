@@ -77,7 +77,13 @@ window.onload = function _onload() {
                 labels: labels,
                 datasets: datasets
             },
-            options: { scales: { x: { beginAtZero: true }, y: { beginAtZero: true } } }
+            options: { 
+                scales: { 
+                    x: { beginAtZero: true }, 
+                    y: { beginAtZero: true } 
+                },
+                maintainAspectRatio: false,
+            }
         });
     }
 
