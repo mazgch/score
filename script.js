@@ -12,24 +12,23 @@ window.onload = function _onload() {
     let datasets = [];
 
     const cookieTag = "names=";
-    let names = [ 'Nicole', 'Michael', 'Oliver', 'Rafael' ];
+    let names = [ "Player 1", "Player 2" ];
     document.cookie.split(';').forEach( function _cookie(cookie) {
-        if (cookie.startsWith(cookieTag)) {
-            try {
-                let newNames = JSON.parse(cookie.substring(cookieTag.length));
-                for (let i = 0; i < newNames.length; i ++) {
-                    names[i] = newNames[i];
-                }
-            } catch (e) {
+        try {
+            if (cookie.startsWith(cookieTag)) {
+                names = JSON.parse(cookie.substring(cookieTag.length));
             }
+        } catch (e) {
         }
     });
+    let players = getParameterByName('n') || names.length;
+    names.length = players;
+    
     window.onunload = function _onunload() {
         document.cookie = cookieTag + JSON.stringify(names);
     }
-
-    const players = getParameterByName('n') || 2;
     for (let i = 0; i < players; i ++) {
+        if (!names[i]) names[i] = "Player " + i;
         let newCell = document.createElement("TH");
         newCell.textContent = names[i];
         newCell.setAttribute("edittype", "text");
