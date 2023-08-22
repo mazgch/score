@@ -24,6 +24,10 @@ window.onload = function _onload() {
     let players = getParameterByName('n') || names.length;
     names.length = players;
     
+    window.setPlayers = function _reset(n) {
+        document.cookie = cookieTag + JSON.stringify(names);
+        location.href='?n='+n;
+    }
     window.onunload = function _onunload() {
         document.cookie = cookieTag + JSON.stringify(names);
     }

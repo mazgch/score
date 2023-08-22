@@ -9,11 +9,11 @@
     <body>
         <h2>🎲 Board Game - Score Board 🎲</h2> 
         <div style="text-align:center; font-size: 12px;">
-            Number of Players:    
-            <span onclick="location.href='?n=1';">1️⃣</span> 
-            <span onclick="location.href='?n=2';">2️⃣</span> 
-            <span onclick="location.href='?n=3';">3️⃣</span> 
-            <spac onclick="location.href='?n=4';">4️⃣</span>
+            Reset, Number of Players:    
+            <span onclick="window.setPlayers(1)">1️⃣</span> 
+            <span onclick="window.setPlayers(2);">2️⃣</span> 
+            <span onclick="window.setPlayers(3);">3️⃣</span> 
+            <spac onclick="window.setPlayers(4);">4️⃣</span>
         </div>
         <div style="height:300px"><canvas id="scoreChart"></canvas></div>
         <table id="table">
