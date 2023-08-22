@@ -20,7 +20,6 @@ window.onload = function _onload() {
         name.appendChild(newCell);
         newCell = document.createElement("TH");
         newCell.textContent = 0;
-        newCell.setAttribute("edittype", "text");
         score.appendChild(newCell);
         newCell = scores.firstElementChild.insertCell();
         newCell.setAttribute("edittype", "number");
@@ -58,6 +57,26 @@ window.onload = function _onload() {
             let changed = input.value != input.oldValue;
             cell.textContent = input.value;
             updateScore();
+            let isNum = true;
+            for (let p = 0; isNum && (p < players); p++) {
+                let val = parseInt(scores.firstElementChild.children[p+1].textContent);
+                isNum = Number.isInteger(val);
+            }
+            if (isNum) {
+                const numRows = scores.rows.length;
+                const newRow = scores.insertRow(0);
+                for (let i = 0; i < table.rows[0].cells.length; i++) {
+                    const newCell = newRow.insertCell();
+                    newCell.textContent = '';
+                    if (i > 0) {
+                        newCell.setAttribute("edittype", "number");
+                    }
+                }
+                newRow.children[0].innerHTML = "Round " + (numRows+1);
+                nextCell = newRow.children[1];
+                makeCellEditable(nextCell);
+            }
+
         });
         input.addEventListener('keydown', function _keydown(e) {
             if ((e.key === 'Enter') || (e.key === 'Tab')) {
@@ -65,22 +84,8 @@ window.onload = function _onload() {
                 input.blur();
                 if((input.value != "") && (input.type == "number")) {
                     let nextCell = cell.nextElementSibling;
-                    if (!nextCell) {
-                        if (scores.firstElementChild === cell.parentNode) {
-                            const numRows = scores.rows.length;
-                            const newRow = scores.insertRow(0);
-                            for (let i = 0; i < table.rows[0].cells.length; i++) {
-                                const newCell = newRow.insertCell();
-                                newCell.textContent = '';
-                                if (i > 0) {
-                                    newCell.setAttribute("edittype", "number");
-                                }
-                            }
-                            newRow.children[0].innerHTML = "Round " + (numRows+1);
-                            nextCell = newRow.children[1];
-                        } else {
-                            nextCell = cell.parentNode.nextElementSibling.children[1];
-                        }
+                    if (!nextCell && (scores.firstElementChild !== cell.parentNode)) {
+                        nextCell = cell.parentNode.nextElementSibling.children[1];
                     }
                     if (nextCell) {
                         makeCellEditable(nextCell);
@@ -139,7 +144,7 @@ window.onload = function _onload() {
         for (let s = 0; s < num; s++) {
             labels[s] = s+1;
             for (let p = 0; p < players; p++) {
-                let val = parseInt(((s < num) ? scores.children[num - s - 1] : input).children[p+1].innerHTML)
+                let val = parseInt(((s < num) ? scores.children[num - s - 1] : input).children[p+1].textContent)
                 if (Number.isInteger(val)) {
                     sum[p] += val;
                     datasets[p].data[s] = sum[p];
