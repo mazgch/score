@@ -8,6 +8,7 @@ window.onload = function _onload() {
     
     const table = document.getElementById('table');
     const scores = document.getElementById('scores');
+    const time = document.getElementById("time");
     const name = document.getElementById("name");
     const score = document.getElementById("score");
     
@@ -35,6 +36,9 @@ window.onload = function _onload() {
         let newCell = document.createElement("TH");
         newCell.textContent = "Player";
         name.replaceChildren(newCell);
+        // newCell = document.createElement("TH");
+        // newCell.textContent = "Time";
+        // time.replaceChildren(newCell);
         newCell = document.createElement("TH");
         newCell.textContent = "Score";
         score.replaceChildren(newCell);
@@ -48,6 +52,8 @@ window.onload = function _onload() {
             newCell.textContent = names[i];
             newCell.setAttribute("edittype", "text");
             name.appendChild(newCell);
+            // newCell = document.createElement("TH");
+            // time.appendChild(newCell);
             newCell = document.createElement("TH");
             newCell.textContent = 0;
             score.appendChild(newCell);
