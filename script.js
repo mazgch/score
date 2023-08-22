@@ -46,20 +46,21 @@ window.onload = function _onload() {
 
     function makeCellEditable(cell) {
         const input = document.createElement('input');
-        input.newValue = cell.textContent;
-        input.value = input.newValue;
+        input.oldValue = cell.textContent;
+        input.value = input.oldValue;
         input.type = cell.getAttribute("edittype");
         if(input.type === "number") {
             input.pattern = "[0-9]*";
         }
         cell.replaceChildren(input);
         input.focus();
-        input.addEventListener('blur', function _blur() {
-            cell.textContent = input.newValue;
+        input.addEventListener('blur', function _blur(e) {
+            let changed = input.value != input.oldValue;
+            cell.textContent = input.value;
+            updateScore();
         });
         input.addEventListener('keydown', function _keydown(e) {
             if ((e.key === 'Enter') || (e.key === 'Tab')) {
-                input.newValue = input.value;
                 e.preventDefault();
                 input.blur();
                 if((input.value != "") && (input.type == "number")) {
@@ -85,8 +86,8 @@ window.onload = function _onload() {
                         makeCellEditable(nextCell);
                     }
                 }
-                updateScore();
             } else if (e.key === 'Escape') {
+                input.value = input.oldValue;
                 e.preventDefault();
                 input.blur();
             }

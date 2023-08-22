@@ -3,11 +3,18 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <title>Board Game Score Board</title>
+        <title>🎲 Board Game Score Board 🎲</title>
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <h2>Board Game Score Board <a href="?n=2">2️⃣</a> <a href="?n=3">3️⃣</a> <a href="?n=4">4️⃣</a></h2> 
+        <h2>🎲 Board Game Score Board 🎲</h2> 
+        <div style="text-align:center; font-size: 12px;">
+            Number of Players:    
+            <span onclick="location.href='?n=1';">1️⃣</span> 
+            <span onclick="location.href='?n=2';">2️⃣</span> 
+            <span onclick="location.href='?n=3';">3️⃣</span> 
+            <spac onclick="location.href='?n=4';">4️⃣</span>
+        </div>
         <div style="height:300px"><canvas id="scoreChart"></canvas></div>
         <table id="table">
             <thead>
