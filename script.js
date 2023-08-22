@@ -11,7 +11,23 @@ window.onload = function _onload() {
     let labels = [];
     let datasets = [];
 
-    const names = [ 'Nicole', 'Michael', 'Oliver', 'Rafael' ];
+    const cookieTag = "names=";
+    let names = [ 'Nicole', 'Michael', 'Oliver', 'Rafael' ];
+    document.cookie.split(';').forEach( function _cookie(cookie) {
+        if (cookie.startsWith(cookieTag)) {
+            try {
+                let newNames = JSON.parse(cookie.substring(cookieTag.length));
+                for (let i = 0; i < newNames.length; i ++) {
+                    names[i] = newNames[i];
+                }
+            } catch (e) {
+            }
+        }
+    });
+    window.onunload = function _onunload() {
+        document.cookie = cookieTag + JSON.stringify(names);
+    }
+
     const players = getParameterByName('n') || 2;
     for (let i = 0; i < players; i ++) {
         let newCell = document.createElement("TH");
@@ -24,11 +40,13 @@ window.onload = function _onload() {
         newCell = scores.firstElementChild.insertCell();
         newCell.setAttribute("edittype", "number");
     }
-    table.addEventListener('click', function (event) {
-        const cell = event.target;
-        if (cell.hasAttribute("edittype") &&
-            !cell.querySelector('input')) {
+    table.addEventListener('click', function _click(e) {
+        const cell = e.target;
+        if (cell.hasAttribute("edittype") && !cell.querySelector('input')) {
             makeCellEditable(cell);
+        }
+        else {
+            e.preventDefault();
         }
     });
     initChart();
@@ -43,6 +61,27 @@ window.onload = function _onload() {
         return decodeURIComponent(results[2].replace(/\+/g, ' '));
     }
 
+    function setCookie(name,value,days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+
     function makeCellEditable(cell) {
         const input = document.createElement('input');
         input.oldValue = cell.textContent;
@@ -52,7 +91,7 @@ window.onload = function _onload() {
             input.pattern = "[0-9]*";
         }
         cell.replaceChildren(input);
-        input.focus());
+        input.focus();
         input.addEventListener('blur', function _blur(e) {
             let changed = input.value != input.oldValue;
             cell.textContent = input.value;
@@ -138,7 +177,7 @@ window.onload = function _onload() {
         let sum = [];
         for (let p = 0; p < players; p++) {
             sum[p] = 0;
-            datasets[p].label = name.children[p+1].innerHTML;
+            datasets[p].label = names[p] = name.children[p+1].textContent;
         }
         for (let s = 0; s < num; s++) {
             labels[s] = s+1;
