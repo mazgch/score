@@ -52,7 +52,7 @@ window.onload = function _onload() {
             input.pattern = "[0-9]*";
         }
         cell.replaceChildren(input);
-        input.focus();
+        input.focus());
         input.addEventListener('blur', function _blur(e) {
             let changed = input.value != input.oldValue;
             cell.textContent = input.value;
@@ -73,23 +73,22 @@ window.onload = function _onload() {
                     }
                 }
                 newRow.children[0].innerHTML = "Round " + (numRows+1);
-                nextCell = newRow.children[1];
-                makeCellEditable(nextCell);
+                makeCellEditable(newRow.children[1]);
             }
-
         });
         input.addEventListener('keydown', function _keydown(e) {
             if ((e.key === 'Enter') || (e.key === 'Tab')) {
                 e.preventDefault();
-                input.blur();
-                if((input.value != "") && (input.type == "number")) {
-                    let nextCell = cell.nextElementSibling;
+                let nextCell;
+                if ((input.value != "") && (input.type == "number")) {
+                    nextCell = cell.nextElementSibling;
                     if (!nextCell && (scores.firstElementChild !== cell.parentNode)) {
                         nextCell = cell.parentNode.nextElementSibling.children[1];
                     }
-                    if (nextCell) {
-                        makeCellEditable(nextCell);
-                    }
+                }
+                input.blur();
+                if (nextCell) {
+                    makeCellEditable(nextCell);
                 }
             } else if (e.key === 'Escape') {
                 input.value = input.oldValue;
