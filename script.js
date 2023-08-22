@@ -2,15 +2,15 @@
 "use strict";
 
 window.onload = function _onload() {
-
+    let chart = undefined;
+    let labels = [];
+    let datasets = [];
+    
     const table = document.getElementById('table');
     const scores = document.getElementById('scores');
     const name = document.getElementById("name");
     const score = document.getElementById("score");
-    let chart;
-    let labels = [];
-    let datasets = [];
-
+    
     const cookieTag = "names=";
     let names = [ "Player 1", "Player 2" ];
     document.cookie.split(';').forEach( function _cookie(cookie) {
@@ -21,28 +21,43 @@ window.onload = function _onload() {
         } catch (e) {
         }
     });
-    let players = getParameterByName('n') || names.length;
-    names.length = players;
     
-    window.setPlayers = function _reset(n) {
-        document.cookie = cookieTag + JSON.stringify(names);
-        location.href='?n='+n;
-    }
+    resetPlayers(names.length);
+    
     window.onunload = function _onunload() {
         document.cookie = cookieTag + JSON.stringify(names);
     }
-    for (let i = 0; i < players; i ++) {
-        if (!names[i]) names[i] = "Player " + i;
+    
+    window.setPlayers = resetPlayers;
+    
+    function resetPlayers(n) {
+        names.length = n;
         let newCell = document.createElement("TH");
-        newCell.textContent = names[i];
-        newCell.setAttribute("edittype", "text");
-        name.appendChild(newCell);
+        newCell.textContent = "Player";
+        name.replaceChildren(newCell);
         newCell = document.createElement("TH");
-        newCell.textContent = 0;
-        score.appendChild(newCell);
-        newCell = scores.firstElementChild.insertCell();
-        newCell.setAttribute("edittype", "number");
+        newCell.textContent = "Score";
+        score.replaceChildren(newCell);
+        newCell = document.createElement("TR");
+        scores.replaceChildren(newCell);
+        newCell = newCell.insertCell();    
+        newCell.textContent = "Round 1";
+        for (let i = 0; i < names.length; i ++) {
+            if (!names[i]) names[i] = "Player " + (i+1);
+            newCell = document.createElement("TH");
+            newCell.textContent = names[i];
+            newCell.setAttribute("edittype", "text");
+            name.appendChild(newCell);
+            newCell = document.createElement("TH");
+            newCell.textContent = 0;
+            score.appendChild(newCell);
+            newCell = scores.firstElementChild.insertCell();
+            newCell.setAttribute("edittype", "number");
+        }
+        initChart();
+        makeCellEditable(scores.rows[0].children[1]);
     }
+    
     table.addEventListener('click', function _click(e) {
         const cell = e.target;
         if (cell.hasAttribute("edittype") && !cell.querySelector('input')) {
@@ -52,39 +67,7 @@ window.onload = function _onload() {
             e.preventDefault();
         }
     });
-    initChart();
-    makeCellEditable(scores.rows[0].children[1]);
     
-    function getParameterByName(name, url = window.location.href) {
-        name = name.replace(/[\[\]]/g, '\\$&');
-        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-            results = regex.exec(url);
-        if (!results) return null;
-        if (!results[2]) return '';
-        return decodeURIComponent(results[2].replace(/\+/g, ' '));
-    }
-
-    function setCookie(name,value,days) {
-        var expires = "";
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days*24*60*60*1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-    }
-
-    function getCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0;i < ca.length;i++) {
-            var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-        }
-        return null;
-    }
-
     function makeCellEditable(cell) {
         const input = document.createElement('input');
         input.oldValue = cell.textContent;
@@ -100,7 +83,7 @@ window.onload = function _onload() {
             cell.textContent = input.value;
             updateScore();
             let isNum = true;
-            for (let p = 0; isNum && (p < players); p++) {
+            for (let p = 0; isNum && (p < names.length); p++) {
                 let val = parseInt(scores.firstElementChild.children[p+1].textContent);
                 isNum = Number.isInteger(val);
             }
@@ -141,8 +124,14 @@ window.onload = function _onload() {
     }
 
     function initChart() {
+        if (chart !== undefined) {
+            chart.destroy();
+        }
+        chart = undefined;
+        datasets = [];
+        labels = [];
         let ctx = document.getElementById('scoreChart').getContext('2d');
-        for (let p = 0; p < players; p++) {
+        for (let p = 0; p < names.length; p++) {
             datasets[p] = {
                 label: name.children[p+1].innerHTML,
                 fill: false,
@@ -169,7 +158,7 @@ window.onload = function _onload() {
                 }
             }
         });
-        for (let p = 0; p < players; p++) {
+        for (let p = 0; p < names.length; p++) {
             name.children[p+1].style.backgroundColor = datasets[p].backgroundColor;
         }
         updateScore();
@@ -178,13 +167,13 @@ window.onload = function _onload() {
     function updateScore() {
         let num = scores.childElementCount;
         let sum = [];
-        for (let p = 0; p < players; p++) {
+        for (let p = 0; p < names.length; p++) {
             sum[p] = 0;
             datasets[p].label = names[p] = name.children[p+1].textContent;
         }
         for (let s = 0; s < num; s++) {
             labels[s] = s+1;
-            for (let p = 0; p < players; p++) {
+            for (let p = 0; p < names.length; p++) {
                 let val = parseInt(((s < num) ? scores.children[num - s - 1] : input).children[p+1].textContent)
                 if (Number.isInteger(val)) {
                     sum[p] += val;
@@ -194,7 +183,7 @@ window.onload = function _onload() {
                 }
             }
         }
-        for (let p = 0; p < players; p++) {
+        for (let p = 0; p < names.length; p++) {
             score.children[p+1].innerHTML = sum[p];
         }
         chart.update();

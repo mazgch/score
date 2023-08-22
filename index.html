@@ -10,25 +10,21 @@
         <h2>🎲 Board Game - Score Board 🎲</h2> 
         <div style="text-align:center; font-size: 12px;">
             Reset, Number of Players:    
-            <span onclick="window.setPlayers(1)">1️⃣</span> 
+            <span onclick="window.setPlayers(1);">1️⃣</span> 
             <span onclick="window.setPlayers(2);">2️⃣</span> 
             <span onclick="window.setPlayers(3);">3️⃣</span> 
-            <spac onclick="window.setPlayers(4);">4️⃣</span>
+            <span onclick="window.setPlayers(4);">4️⃣</span>
+            <span onclick="window.setPlayers(5);">5️⃣</span> 
+            <span onclick="window.setPlayers(6);">6️⃣</span>
         </div>
         <div style="height:300px"><canvas id="scoreChart"></canvas></div>
         <table id="table">
             <thead>
-                <tr id="name">
-                    <th>Player</th>
-                </tr>
-                <tr id="score">
-                    <th>Total Score</th>
-                </tr>
+                <tr id="name"></tr>
+                <tr id="score"></tr>
             </thead>
             <tbody id="scores">
-                <tr>
-                    <td>Round 1</td>
-                </tr>
+                <tr></tr>
             </tbody>
         </table>
         <script src="script.js"></script>
