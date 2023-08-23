@@ -11,7 +11,8 @@ window.onload = function _onload() {
     const time = document.getElementById("time");
     const name = document.getElementById("name");
     const score = document.getElementById("score");
-    
+    feather.replace();
+
     const cookieTag = "names=";
     let names = [ "Player 1", "Player 2" ];
     document.cookie.split(';').forEach( function _cookie(cookie) {
@@ -23,7 +24,7 @@ window.onload = function _onload() {
         }
     });
     
-    resetPlayers(names.length);
+    resetPlayers();
     
     window.onunload = function _onunload() {
         document.cookie = cookieTag + JSON.stringify(names);
@@ -32,25 +33,13 @@ window.onload = function _onload() {
     window.setPlayers = resetPlayers;
     
     function resetPlayers(n) {
-        if (n > 0) {
-            n = names.length = n;
-        } else {
-            n = names.length;
+        if (n !== undefined) {
+            names.length = Math.max(1, names.length + n);
         }
         let newCell = document.createElement("TH");
-        newCell.id = "Players";
-        newCell.innerHTML = "<span onclick=\"window.setPlayers("+ (n-1) + ");\">➖</span>"+
-                            " Players "+
-                            "<span iconright onclick=\"window.setPlayers("+ (n+1) + ");\">➕</span>";
-        name.replaceChildren(newCell);
-        // newCell = document.createElement("TH");
-        // newCell.textContent = "Time";
-        // time.replaceChildren(newCell);
-        newCell = document.createElement("TH");
-        newCell.id = "Score";
-        newCell.innerHTML = "<span onclick='window.setPlayers("+n+");'>🗑</span>" + 
-                            "Score ";
-        score.replaceChildren(newCell);
+        name.replaceChildren(name.firstElementChild);
+        // time.replaceChildren((time.firstElementChild);
+        score.replaceChildren(score.firstElementChild);
         newCell = document.createElement("TR");
         scores.replaceChildren(newCell);
         newCell = newCell.insertCell();    
@@ -84,6 +73,7 @@ window.onload = function _onload() {
     });
     
     function makeCellEditable(cell) {
+        if (cell === undefined) return;
         const input = document.createElement('input');
         input.oldValue = cell.textContent;
         input.value = input.oldValue;
