@@ -32,15 +32,24 @@ window.onload = function _onload() {
     window.setPlayers = resetPlayers;
     
     function resetPlayers(n) {
-        names.length = n;
+        if (n > 0) {
+            n = names.length = n;
+        } else {
+            n = names.length;
+        }
         let newCell = document.createElement("TH");
-        newCell.textContent = "Player";
+        newCell.id = "Players";
+        newCell.innerHTML = "<span onclick=\"window.setPlayers("+ (n-1) + ");\">➖</span>"+
+                            " Players "+
+                            "<span iconright onclick=\"window.setPlayers("+ (n+1) + ");\">➕</span>";
         name.replaceChildren(newCell);
         // newCell = document.createElement("TH");
         // newCell.textContent = "Time";
         // time.replaceChildren(newCell);
         newCell = document.createElement("TH");
-        newCell.textContent = "Score";
+        newCell.id = "Score";
+        newCell.innerHTML = "<span onclick='window.setPlayers("+n+");'>🗑</span>" + 
+                            "Score ";
         score.replaceChildren(newCell);
         newCell = document.createElement("TR");
         scores.replaceChildren(newCell);
@@ -153,8 +162,8 @@ window.onload = function _onload() {
             },
             options: { 
                 scales: { 
-                    x: { beginAtZero: true, title: { text: "After Round", display: true } }, 
-                    y: { beginAtZero: true, title: { text: "Cumulative Score", display: true } } 
+                    x: { beginAtZero: true, title: { text: "Round", display: true } }, 
+                    y: { beginAtZero: true, title: { text: "Score", display: true } } 
                 },
                 maintainAspectRatio: false,
                 plugins: {

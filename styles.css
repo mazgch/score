@@ -27,6 +27,41 @@ input {
     width: 6em;
     border: 1px solid black;
     text-align: center;
+    position: relative;
+}
+
+th[edittype]:not(:focus-within)::before,
+td[edittype]:not(:focus-within)::before {
+    content: '✎';
+}
+
+th span,
+th[edittype]:not(:focus-within)::before,
+td[edittype]:not(:focus-within)::before {
+    opacity: 0.3;
+}
+
+th span,
+th[edittype]:not(:focus-within)::before,
+td[edittype]:not(:focus-within)::before {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.3; 
+    transition: opacity 0.3s ease;
+}
+
+th span[iconright] {
+    right: 5px;
+    left: unset;
+}
+
+th:hover span,
+th[edittype]:hover::before,
+td[edittype]:hover::before {
+    opacity: 1; 
+    transition: opacity 0.3s ease; 
 }
 
 input {
@@ -53,7 +88,7 @@ tbody td:first-child {
     0% { opacity: 0; }
     100% { opacity: 1; }
 }
-
 .input--focused {
     animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
 }
+
