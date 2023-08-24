@@ -26,7 +26,7 @@ input {
     height: 2em;
     width: 6em;
     padding: 0;
-    border: 0.05em solid black;
+    border: 0.1em solid black;
     text-align: center;
     position: relative;
 }
