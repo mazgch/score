@@ -1,13 +1,13 @@
 body {
     font-family: Arial, sans-serif;
     font-size: 16px;
-    padding: 10px 10px;
+    padding: 0.5em 0.5em;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 1em;
 }
 
 h2, p {
@@ -25,7 +25,8 @@ td,
 input {
     height: 2em;
     width: 6em;
-    border: 1px solid black;
+    padding: 0;
+    border: 0.05em solid black;
     text-align: center;
     position: relative;
 }
@@ -45,7 +46,7 @@ th span,
 th[edittype]:not(:focus-within)::before,
 td[edittype]:not(:focus-within)::before {
     position: absolute;
-    left: 5px;
+    left: 0.5em;
     top: 50%;
     transform: translateY(-50%);
     opacity: 0.3; 
@@ -53,7 +54,7 @@ td[edittype]:not(:focus-within)::before {
 }
 
 th span[iconright] {
-    right: 5px;
+    right: 0.5em;
     left: unset;
 }
 
@@ -65,7 +66,7 @@ td[edittype]:hover::before {
 }
 
 input {
-    border: 2px solid black;;
+    border: 0.1em solid black;;
     outline: none;
     width: 100%;
     height: 100%;
