@@ -77,7 +77,7 @@ input {
     background: inherit;
 }
 
-th,
+thead,
 tbody tr:nth-child(even) {
     background: #f4f4f4;
 }
