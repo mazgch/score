@@ -14,6 +14,6 @@ Ever found yourself scribbling scores on a piece of paper or spending precious g
 
 So why wait? Experience the best in board game night advancements and see who's leading the pack at a glance!
 
-Check it out now: [https://mazgch.github.io/score/]
+Check it out now: https://mazgch.github.io/score/
 
 If you are tired of counting manualy the score during your favourite turn based board game: this a simple webpage is your solution. 
