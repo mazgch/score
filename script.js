@@ -64,23 +64,25 @@ window.onload = function _onload() {
     }
     
     table.addEventListener('click', function _click(e) {
-        const cell = e.target;
+        let newCell = e.target;
+        if (!newCell.hasAttribute("edittype")) {
+            newCell = undefined;
+        }
         if (input !== undefined) {
             input.blur()
-            let cell = input.parentNode;
-            cell.textContent = input.value;
+            let oldCell = input.parentNode;
+            oldCell.textContent = input.value;
             input = undefined;
-            nextCell(cell); // mker sure there is space
+            nextCell(oldCell); // mekes sure there is new round 
             updateScore();
-        } 
-        if (cell.hasAttribute("edittype") && !cell.querySelector('input')) {
-            makeCellEditable(cell);
         }
-        else {
+        if (newCell) {
+            makeCellEditable(newCell);
+        } else { 
             e.preventDefault();
         }
     });
-    
+     
     function nextEmptyCell(cell) {
         if (cell === undefined) return;
         let nextCell = cell;
