@@ -5,6 +5,7 @@ window.onload = function _onload() {
     let chart = undefined;
     let labels = [];
     let datasets = [];
+    let input;
     
     const table = document.getElementById('table');
     const scores = document.getElementById('scores');
@@ -64,6 +65,14 @@ window.onload = function _onload() {
     
     table.addEventListener('click', function _click(e) {
         const cell = e.target;
+        if (input !== undefined) {
+            input.blur()
+            let cell = input.parentNode;
+            cell.textContent = input.value;
+            input = undefined;
+            nextCell(cell); // mker sure there is space
+            updateScore();
+        } 
         if (cell.hasAttribute("edittype") && !cell.querySelector('input')) {
             makeCellEditable(cell);
         }
@@ -72,9 +81,67 @@ window.onload = function _onload() {
         }
     });
     
-    function makeCellEditable(cell) {
+    function nextEmptyCell(cell) {
         if (cell === undefined) return;
-        const input = document.createElement('input');
+        let nextCell = cell;
+        while (nextCell) {
+            const value = parseInt(nextCell.textContent);
+            const isEmpty = !Number.isInteger(value)
+            if (nextCell.hasAttribute("edittype") && isEmpty)
+                return nextCell;
+            nextCell = nextCell.nextElementSibling;
+        } 
+        nextCell = cell;
+        while (nextCell) {
+            const value = parseInt(nextCell.textContent);
+            const isEmpty = !Number.isInteger(value)
+            if (nextCell.hasAttribute("edittype") && isEmpty)
+                return nextCell;
+            nextCell = nextCell.previousElementSibling;
+        }
+        return nextCell;
+    }
+
+    function nextTableCell(cell) {
+        if (cell === undefined) return;
+        let nextCell = cell.nextElementSibling;
+        do {
+            while (nextCell) {
+                if (nextCell.hasAttribute("edittype"));
+                    return nextCell;
+                nextCell = nextCell.nextElementSibling;
+            } 
+            if (cell.parentNode.nextElementSibling) {
+                nextCell = nextCell.firstElementChild;
+            }
+        } while (nextCell);
+        return nextCell;
+    }
+    
+    function nextCell(cell) {
+        let nextCell;
+        if (cell.parentNode === scores.firstElementChild) {
+            nextCell = nextEmptyCell(cell);
+            if (!nextCell) {   
+                const numRows = scores.rows.length;
+                const newRow = scores.insertRow(0);
+                const newCell = newRow.insertCell();
+                newCell.textContent = "Round " + (numRows+1);
+                for (let p = 0; p < names.length; p++) {
+                    const newCell = newRow.insertCell();
+                    newCell.setAttribute("edittype", "number");
+                }
+                nextCell = newRow.children[1];
+            }
+        } else {
+            nextCell = nextTableCell()
+        }
+        return nextCell;
+    }
+    
+    function makeCellEditable(cell) {
+        if ((cell === undefined) || !cell.hasAttribute("edittype")) return;
+        input = document.createElement('input');
         input.oldValue = cell.textContent;
         input.value = input.oldValue;
         input.type = cell.getAttribute("edittype");
@@ -83,47 +150,18 @@ window.onload = function _onload() {
         }
         cell.replaceChildren(input);
         input.focus();
-        input.addEventListener('blur', function _blur(e) {
-            let changed = input.value != input.oldValue;
-            cell.textContent = input.value;
-            updateScore();
-            let isNum = true;
-            for (let p = 0; isNum && (p < names.length); p++) {
-                let val = parseInt(scores.firstElementChild.children[p+1].textContent);
-                isNum = Number.isInteger(val);
-            }
-            if (isNum) {
-                const numRows = scores.rows.length;
-                const newRow = scores.insertRow(0);
-                for (let i = 0; i < table.rows[0].cells.length; i++) {
-                    const newCell = newRow.insertCell();
-                    newCell.textContent = '';
-                    if (i > 0) {
-                        newCell.setAttribute("edittype", "number");
-                    }
-                }
-                newRow.children[0].innerHTML = "Round " + (numRows+1);
-                makeCellEditable(newRow.children[1]);
-            }
-        });
         input.addEventListener('keydown', function _keydown(e) {
             if ((e.key === 'Enter') || (e.key === 'Tab')) {
                 e.preventDefault();
-                let nextCell;
-                if ((input.value != "") && (input.type == "number")) {
-                    nextCell = cell.nextElementSibling;
-                    if (!nextCell && (scores.firstElementChild !== cell.parentNode)) {
-                        nextCell = cell.parentNode.nextElementSibling.children[1];
-                    }
-                }
-                input.blur();
-                if (nextCell) {
-                    makeCellEditable(nextCell);
-                }
+                input.blur()
+                cell.textContent = input.value;
+                input = undefined;
+                makeCellEditable(nextCell(cell));
+                updateScore();
             } else if (e.key === 'Escape') {
-                input.value = input.oldValue;
                 e.preventDefault();
-                input.blur();
+                input.value = input.oldValue;
+                
             }
         });
     }
@@ -183,8 +221,8 @@ window.onload = function _onload() {
                 if (Number.isInteger(val)) {
                     sum[p] += val;
                     datasets[p].data[s] = sum[p];
-                } else {
-                    datasets[p].data[s] = undefined;
+                } else if (s + 1 < num) {
+                    datasets[p].data[s] = sum[p];
                 }
             }
         }
