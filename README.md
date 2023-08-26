@@ -4,13 +4,13 @@ Ever found yourself scribbling scores on a piece of paper or spending precious g
 
 ## Key Features:
 
-- *Personalize Your Game:* Set player names for a customized tracking experience! Know who's in the lead with just a glance.
-- *Multiplayer Support*: Whether it's just you or a group of friends, keep track with ease - supports from single to multiple players!
-- *Visualize Your Progress:* Watch your score rise (or fall!) with a per-round development line graph. Perfect for strategists and competitors alike.
-- *User-Friendly Interface:* Easy to use, so you can focus on strategizing rather than tallying.
-- *Real-time Updates:* Add scores on-the-fly and see the changes immediately on the graph.
-- *Compatibility:* Whether you're on a tablet, phone, or desktop, this tracker is optimized for all devices. Score anytime, anywhere!
-- *Save Your Time:* Less time counting means more time playing.
+- **Personalize Your Game:** Set player names for a customized tracking experience! Know who's in the lead with just a glance.
+- **Multiplayer Support**: Whether it's just you or a group of friends, keep track with ease - supports from single to multiple players!
+- **Visualize Your Progress:** Watch your score rise (or fall!) with a per-round development line graph. Perfect for strategists and competitors alike.
+- **User-Friendly Interface:** Easy to use, so you can focus on strategizing rather than tallying.
+- **Real-time Updates:** Add scores on-the-fly and see the changes immediately on the graph.
+- **Compatibility:** Whether you're on a tablet, phone, or desktop, this page is optimized for all devices. Score anytime, anywhere!
+- **Save Your Time:** Less time counting means more time playing.
 
 So why wait? Experience the best in board game night advancements and see who's leading the pack at a glance!
 
