@@ -9,6 +9,33 @@ window.onload = function _onload() {
     const name = document.getElementById("player");
     const score = document.getElementById("score");
     const scores = document.getElementById('scores');
+    const COLORS = [
+        '#0000ff', // blue
+        '#ff0000', // red
+        '#00ff00', // green
+        '#ffff00', // yellow
+        '#ff00ff', // cyan
+        '#00ffff', // magenta
+        '#ff9300', // orange
+        '#942192', // purple
+        '#aa7942', // brown
+        '#919191', // gray
+/*      // chart.js default palette
+        '#36a2eb', //'rgb(54, 162, 235)',  // blue
+        '#ff6384', //'rgb(255, 99, 132)',  // red
+        '#ffcd56', //'rgb(255, 205, 86)',  // yellow
+        '#4bc0c0', //'rgb(75, 192, 192)',  // green
+        '#ff9f40', //'rgb(255, 159, 64)',  // orange
+        '#9966ff', //'rgb(153, 102, 255)', // purple
+        '#c9cbcf', //'rgb(201, 203, 207)'  // grey  */
+    ];
+    function bgndColor(color) {
+        return "rgba(" + 
+                parseInt(color.slice(1, 3), 16) + "," + 
+                parseInt(color.slice(3, 5), 16) + "," + 
+                parseInt(color.slice(5, 7), 16) + ",0.5)";
+    }
+
     feather.replace();
 
     const cookieTag = "players=";
@@ -32,7 +59,7 @@ window.onload = function _onload() {
     
     function setPlayers(n) {
         n = players.length + ((n === undefined) ? 0 : n);
-        players.length = Math.min(7, Math.max(1,n));
+        players.length = Math.min(COLORS.length, Math.max(1,n));
         initChart();
         let newCell = document.createElement("TH");
         name.replaceChildren(name.firstElementChild);
@@ -45,7 +72,7 @@ window.onload = function _onload() {
             inputCell.value = players[p].name;
             inputCell.onkeyup = updateScore;
             inputCell.style.borderColor = players[p].color;
-            inputCell.style.backgroundColor = players[p].background;
+            inputCell.style.backgroundColor = bgndColor(players[p].color);
             inputCell.onchange = function _onchangeName(e) {
                 const name = inputCell.value;
                 players[p].name = name;
@@ -72,11 +99,7 @@ window.onload = function _onload() {
                 players[p].color = color;
                 datasets[p].borderColor = color;
                 inputCell.style.borderColor = color;
-                const background = "rgba(" + 
-                                  parseInt(color.slice(1, 3), 16) + ", " + 
-                                  parseInt(color.slice(3, 5), 16) + ", " + 
-                                  parseInt(color.slice(5, 7), 16) + ", 0.5)";
-                players[p].background = background;
+                const background = bgndColor(color);
                 datasets[p].backgroundColor = background; 
                 inputCell.style.backgroundColor = background;
                 chart.update();
@@ -104,15 +127,17 @@ window.onload = function _onload() {
         labels = [ 1 ];
         let ctx = document.getElementById('scoreChart').getContext('2d');
         for (let p = 0; p < players.length; p++) {
-            if (!players[p]) players[p] = { name: "Player " + (p+1) }; 
+            if ((players[p] === undefined) || (players[p].constructor !== Object))  players[p] = { };
+            if (!players[p].name)   players[p].name = "Player " + (p+1);
+            if (!players[p].color)  players[p].color = COLORS[p]; 
             datasets[p] = {
                 label: players[p].name,
                 fill: false,
                 tension: 0.1,
-                data: [ 0 ]
+                data: [ 0 ],
+                borderColor: players[p].color,
+                backgroundColor: bgndColor(players[p].color),
             };
-            if (players[p].color !== undefined)       datasets[p].borderColor = players[p].color;
-            if (players[p].background !== undefined)  datasets[p].backgroundColor = players[p].background;
         }
         chart = new Chart(ctx, {
             type: 'line',
@@ -134,10 +159,6 @@ window.onload = function _onload() {
             }
         });
         chart.update();
-        for (let p = 0; p < players.length; p++) {
-            players[p].color = datasets[p].borderColor;
-            players[p].background = datasets[p].backgroundColor;
-        }
     }
     
     function updateScore(insertRow = undefined) {
