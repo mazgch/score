@@ -57,6 +57,7 @@ window.onload = function _onload() {
             spanCell.className = "iconleft";
             spanCell.onclick = function _onclickName(e) { 
                 inputCell.focus(); 
+                inputCell.setSelectionRange(0, inputCell.value.length);
             };
             spanCell.textContent = "✎";
             newCell.appendChild(spanCell);
@@ -100,7 +101,7 @@ window.onload = function _onload() {
         }
         chart = undefined;
         datasets = [];
-        labels = [];
+        labels = [ 1 ];
         let ctx = document.getElementById('scoreChart').getContext('2d');
         for (let p = 0; p < players.length; p++) {
             if (!players[p]) players[p] = { name: "Player " + (p+1) }; 
@@ -108,7 +109,7 @@ window.onload = function _onload() {
                 label: players[p].name,
                 fill: false,
                 tension: 0.1,
-                data: [0]
+                data: [ 0 ]
             };
             if (players[p].color !== undefined)       datasets[p].borderColor = players[p].color;
             if (players[p].background !== undefined)  datasets[p].backgroundColor = players[p].background;
@@ -132,6 +133,7 @@ window.onload = function _onload() {
                 }
             }
         });
+        chart.update();
         for (let p = 0; p < players.length; p++) {
             players[p].color = datasets[p].borderColor;
             players[p].background = datasets[p].backgroundColor;
@@ -168,8 +170,6 @@ window.onload = function _onload() {
                 inputCell.onblur = function _onblur(e) {
                     if (!inputCell.checkValidity()) {
                         inputCell.value = inputCell.oldValue;
-                        // refocus input field at end of call stack if content invalid
-                        // setTimeout(() => inputCell.focus(), 0);
                     } else {
                         updateScore(inputCell.nextRowIx);
                     }
@@ -177,7 +177,7 @@ window.onload = function _onload() {
                 inputCell.onkeyup = function _onkeyup(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        newRow.children[inputCell.nextRowIx+ 1].firstElementChild.focus();
+                        newRow.children[inputCell.nextRowIx+1].firstElementChild.focus();
                         inputCell.blur();
                     } else if (e.key === 'Escape') {
                         e.preventDefault();
@@ -192,7 +192,6 @@ window.onload = function _onload() {
                 spanCell.className = "iconleft";
                 spanCell.onclick = function _click() { 
                     inputCell.focus();
-                    inputCell.setSelectionRange(0, inputCell.value.length);
                 };
                 spanCell.textContent = "✎";
                 newCell.appendChild(spanCell);
