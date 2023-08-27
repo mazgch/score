@@ -4,11 +4,11 @@ Ever found yourself scribbling scores on a piece of paper or spending precious g
 
 ## Key Features:
 
-- **Personalize Your Game:** Set player names for a customized tracking experience! Know who's in the lead with just a glance.
+- **Personalize Your Game:** Set player names and their favourite color for a customized experience! Know who's in the lead with just a glance.
 - **Multiplayer Support**: Whether it's just you or a group of friends, keep track with ease - supports from single to multiple players!
-- **Visualize Your Progress:** Watch your score rise (or fall!) with a per-round development line graph. Perfect for strategists and competitors alike.
+- **Visualize Your Progress:** Watch your score rise (or fall!) with a per-round development line graph. Perfect to gain game insights.
 - **User-Friendly Interface:** Easy to use, so you can focus on strategizing rather than tallying.
-- **Real-time Updates:** Add scores on-the-fly and see the changes immediately on the graph.
+- **Real-time Updates:** Add scores on-the-fly and see the changes immediately on the color-coded graph.
 - **Compatibility:** Whether you're on a tablet, phone, or desktop, this page is optimized for all devices. Score anytime, anywhere!
 - **Save Your Time:** Less time counting means more time playing.
 
