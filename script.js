@@ -9,7 +9,6 @@ window.onload = function _onload() {
     
     const table = document.getElementById('table');
     const scores = document.getElementById('scores');
-    const time = document.getElementById("time");
     const name = document.getElementById("name");
     const score = document.getElementById("score");
     feather.replace();
@@ -34,52 +33,66 @@ window.onload = function _onload() {
     window.setPlayers = resetPlayers;
     
     function resetPlayers(n) {
-        if (n !== undefined) {
-            names.length = Math.max(1, names.length + n);
-        }
+        n = names.length + ((n === undefined) ? 0 : n);
+        names.length = Math.min(7, Math.max(1,n));
+        initChart();
         let newCell = document.createElement("TH");
         name.replaceChildren(name.firstElementChild);
-        // time.replaceChildren((time.firstElementChild);
         score.replaceChildren(score.firstElementChild);
         newCell = document.createElement("TR");
         scores.replaceChildren(newCell);
         newCell = newCell.insertCell();    
         newCell.textContent = "Round 1";
-        for (let i = 0; i < names.length; i ++) {
-            if (!names[i]) names[i] = "Player " + (i+1);
+        for (let p = 0; p < names.length; p ++) {
+            if (!names[p]) names[p] = "Player " + (p+1);
             newCell = document.createElement("TH");
-            newCell.textContent = names[i];
+            newCell.textContent = names[p];
             newCell.setAttribute("edittype", "text");
+            newCell.style.backgroundColor = datasets[p].backgroundColor;
+/*
+            let span = document.createElement("SPAN");
+            span.textContent = "🎨";
+            span.setAttribute("iconright", "");
+            function chooseColor(e) {
+                var colorInput = document.createElement('input');
+                colorInput.type = 'color';
+                colorInput.addEventListener('input', function(event) {
+                    alert('Selected Color: ' + event.target.value);
+                });
+                span.appendChild(colorInput);
+                colorInput.style.opacity = 0;
+                colorInput.click();
+            }
+            span.onclick = chooseColor;
+            newCell.appendChild(span);
+            */
             name.appendChild(newCell);
-            // newCell = document.createElement("TH");
-            // time.appendChild(newCell);
             newCell = document.createElement("TH");
             newCell.textContent = 0;
             score.appendChild(newCell);
             newCell = scores.firstElementChild.insertCell();
             newCell.setAttribute("edittype", "number");
         }
-        initChart();
         makeCellEditable(scores.rows[0].children[1]);
     }
     
     table.addEventListener('click', function _click(e) {
         let newCell = e.target;
-        if (!newCell.hasAttribute("edittype")) {
-            newCell = undefined;
-        }
-        if (input !== undefined) {
-            input.blur()
-            let oldCell = input.parentNode;
-            oldCell.textContent = input.value;
-            input = undefined;
-            nextCell(oldCell); // mekes sure there is new round 
-            updateScore();
-        }
-        if (newCell) {
-            makeCellEditable(newCell);
-        } else { 
-            e.preventDefault();
+        if (input !== newCell) {
+            if (!newCell.hasAttribute("edittype")) {
+                newCell = undefined;
+            }
+            if (input !== undefined) {
+                input.blur()
+                let oldCell = input.parentNode;
+                oldCell.textContent = input.value;
+                input = undefined;
+                nextCell(oldCell); // mekes sure there is new round 
+                updateScore();
+            }
+            if (newCell) {
+                makeCellEditable(newCell);
+            }
         }
     });
      
@@ -163,9 +176,11 @@ window.onload = function _onload() {
             } else if (e.key === 'Escape') {
                 e.preventDefault();
                 input.value = input.oldValue;
-                
             }
         });
+        if (input.type == "text") {
+            input.setSelectionRange(0,input.value.length);
+        }
     }
 
     function initChart() {
@@ -178,7 +193,7 @@ window.onload = function _onload() {
         let ctx = document.getElementById('scoreChart').getContext('2d');
         for (let p = 0; p < names.length; p++) {
             datasets[p] = {
-                label: name.children[p+1].innerHTML,
+                label: names[p],
                 fill: false,
                 tension: 0.1,
                 data: [0]
@@ -203,10 +218,6 @@ window.onload = function _onload() {
                 }
             }
         });
-        for (let p = 0; p < names.length; p++) {
-            name.children[p+1].style.backgroundColor = datasets[p].backgroundColor;
-        }
-        updateScore();
     }
 
     function updateScore() {
@@ -219,7 +230,8 @@ window.onload = function _onload() {
         for (let s = 0; s < num; s++) {
             labels[s] = s+1;
             for (let p = 0; p < names.length; p++) {
-                let val = parseInt(((s < num) ? scores.children[num - s - 1] : input).children[p+1].textContent)
+                let val = scores.children[(num - 1) - s].children[p+1].textContent;
+                val = parseInt(val);
                 if (Number.isInteger(val)) {
                     sum[p] += val;
                     datasets[p].data[s] = sum[p];

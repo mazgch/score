@@ -73,6 +73,11 @@ input {
     font-weight: inherit;
     font-size: inherit;
     background: inherit;
+    animation: blink_input_focus 0.01s;
+}
+@keyframes blink_input_focus {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
 }
 
 thead,
@@ -82,12 +87,3 @@ tbody tr:nth-child(even) {
 tbody td:first-child {
     font-weight:bold;
 }
-
-@keyframes blink_input_opacity_to_prevent_scrolling_when_focus {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-}
-.input--focused {
-    animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
-}
-
