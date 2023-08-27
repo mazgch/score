@@ -11,25 +11,22 @@
         <div style="height:300px"><canvas id="scoreChart"></canvas></div>
         <table id="table">
             <thead>
-                <tr id="name">
+                <tr id="player">
                     <th>
-                        <span onclick="window.setPlayers(-1);">➖</span>
+                        <span class="iconleft" onclick="window.setPlayers(-1);">➖</span>
                         Player
-                        <span iconright onclick="window.setPlayers(+1);">➕</span>
+                        <span class="iconright" onclick="window.setPlayers(+1);">➕</span>
                     </th>
                 </tr>
                 <tr id="score">   
                     <th>
-                        <span onclick="window.setPlayers();">🗑️</span>
+                        <span class="iconleft" onclick="window.setPlayers();">🗑️</span>
                         Score
                     </th>
                 </tr>
             </thead>
-            <tbody id="scores">
-                <tr></tr>
-            </tbody>
+            <tbody id="scores"></tbody>
         </table>
-
 
         <p>
             <span onclick="window.location.assign('https://twitter.com/mazgch/');"                  title="Twitter @mazgch"><i data-feather="twitter"></i></span>

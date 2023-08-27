@@ -5,85 +5,94 @@ body {
     text-align: center;
 }
 
+/* table */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1em;
 }
 
-span,
-td[edittype],
-th[edittype] {
-    cursor: pointer
-}
-
-th,
-td, 
-input {
-    height: 2em;
-    width: 6em;
-    padding: 0;
-    border: 0.1em solid black;
-    text-align: center;
-    position: relative;
-}
-
-th[edittype]:not(:focus-within)::before,
-td[edittype]:not(:focus-within)::before {
-    content: '✎';
-}
-
-th span,
-th[edittype]:not(:focus-within)::before,
-td[edittype]:not(:focus-within)::before {
-    opacity: 0.3;
-}
-
-th span,
-th[edittype]:not(:focus-within)::before,
-td[edittype]:not(:focus-within)::before {
-    position: absolute;
-    left: 0.5em;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.3; 
-    transition: opacity 0.3s ease;
-}
-
-th span[iconright] {
-    right: 0.5em;
-    left: unset;
-}
-
-th:hover span,
-th[edittype]:hover::before,
-td[edittype]:hover::before {
-    opacity: 1; 
-    transition: opacity 0.3s ease; 
-}
-
-input {
-    border: 0.1em solid black;
-    border-radius: 0;
-    outline: none;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    font-family: inherit;
-    font-weight: inherit;
-    font-size: inherit;
-    background: inherit;
-    animation: blink_input_focus 0.01s;
-}
-@keyframes blink_input_focus {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+thead,
+tbody td:first-child {
+    font-weight:bold;
 }
 
 thead,
 tbody tr:nth-child(even) {
     background: #f4f4f4;
 }
-tbody td:first-child {
-    font-weight:bold;
+
+th,
+td {
+    height: 2em;
+    width: 6em;
+    padding: 0;
+    border: 0.1em solid black;
+    position: relative;
 }
+
+/* icons */
+.iconright, 
+.iconleft {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.3; 
+}
+
+.iconleft:hover,
+.iconright:hover {
+    opacity: 1; 
+}
+
+.iconleft {
+    left: 0.5em;
+}
+
+.iconright {
+    right: 0.5em;
+}
+
+/* input */
+input {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    text-align: center;
+    position: absolute;
+    outline: none;
+    border-radius: 0;
+    border: 0em solid black;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    animation: blink_input_focus 0.01s;
+}
+
+input:focus {
+    border: 0.1em solid black;
+} 
+
+input[pattern]:invalid {
+    color: red; /* Light red */
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+@keyframes blink_input_focus {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+
