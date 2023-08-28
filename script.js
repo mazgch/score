@@ -30,10 +30,20 @@ window.onload = function _onload() {
         '#c9cbcf', //'rgb(201, 203, 207)'  // grey  */
     ];
     function bgndColor(color) {
-        return "rgba(" + 
-                parseInt(color.slice(1, 3), 16) + "," + 
-                parseInt(color.slice(3, 5), 16) + "," + 
-                parseInt(color.slice(5, 7), 16) + ",0.5)";
+        const r = parseInt(color.slice(1, 3), 16); 
+        const g = parseInt(color.slice(3, 5), 16); 
+        const b = parseInt(color.slice(5, 7), 16);
+        return "rgba(" + r + "," + g + "," + b + ",0.5)";
+    }
+
+    function textColor(color) {
+        const r = parseInt(color.slice(1, 3), 16); 
+        const g = parseInt(color.slice(3, 5), 16); 
+        const b = parseInt(color.slice(5, 7), 16);
+        const max = Math.max(r,g,b);
+        const min = Math.min(r,g,b);
+        const lightness = (min + max) / 2;
+        return (lightness >= 127) ? "#000000" : "#ffffff";
     }
 
     feather.replace();
@@ -72,6 +82,7 @@ window.onload = function _onload() {
             inputCell.value = players[p].name;
             inputCell.onkeyup = updateScore;
             inputCell.style.borderColor = players[p].color;
+            //inputCell.style.color = textColor(players[p].color);
             inputCell.style.backgroundColor = bgndColor(players[p].color);
             inputCell.onchange = function _onchangeName(e) {
                 const name = inputCell.value;
@@ -99,6 +110,7 @@ window.onload = function _onload() {
                 players[p].color = color;
                 datasets[p].borderColor = color;
                 inputCell.style.borderColor = color;
+                //inputCell.style.color = textColor(color);
                 const background = bgndColor(color);
                 datasets[p].backgroundColor = background; 
                 inputCell.style.backgroundColor = background;
