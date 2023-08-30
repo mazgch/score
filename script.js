@@ -97,7 +97,7 @@ window.onload = function _onload() {
                 inputCell.focus(); 
                 inputCell.setSelectionRange(0, inputCell.value.length);
             };
-            spanCell.textContent = "✎";
+            spanCell.textContent = "✏️";
             newCell.appendChild(spanCell);
             spanCell = document.createElement("SPAN");
             spanCell.className = "iconright";
@@ -125,6 +125,10 @@ window.onload = function _onload() {
             name.appendChild(newCell);
             newCell = document.createElement("TH");
             newCell.textContent = 0;
+            let rankCell = document.createElement("SPAN");
+            rankCell.className = "iconrank";
+            rankCell.textContent = "";
+            newCell.appendChild(rankCell);
             score.appendChild(newCell);
         }
         updateScore(0);
@@ -226,7 +230,7 @@ window.onload = function _onload() {
                 spanCell.onclick = function _click() { 
                     inputCell.focus();
                 };
-                spanCell.textContent = "✎";
+                spanCell.textContent = "✏️";
                 newCell.appendChild(spanCell);
             }
             newRow.children[insertRow + 1].firstElementChild.focus();
@@ -246,8 +250,13 @@ window.onload = function _onload() {
                 }
             }
         }
+        const sortedSum = [...sum].sort((a, b) => b - a);
+        const rank = sum.map(s => sortedSum.indexOf(s));
         for (let p = 0; p < players.length; p++) {
-            score.children[p+1].textContent = sum[p];
+            score.children[p+1].firstChild.textContent = sum[p];
+            const medals = [ "🥇", "🥈", "🥉" ];
+            const medal = (medals[rank[p]] !== undefined) ? medals[rank[p]] : "";
+            score.children[p+1].firstElementChild.textContent = medal;
         }
         chart.update();
     }

@@ -44,6 +44,7 @@ td {
 }
 
 /* icons */
+.iconrank,
 .iconright, 
 .iconleft {
     cursor: pointer;
@@ -66,6 +67,12 @@ td {
     right: 0.5em;
 }
 
+.iconrank {
+    left: 0.5em;
+    opacity: 1;
+}
+
+
 /* input */
 input {
     top: 0;
@@ -78,6 +85,7 @@ input {
     outline: none;
     border-radius: 0;
     border: 0em solid black;
+    background: inherit;
     box-sizing: border-box;
     font-family: inherit;
     font-weight: inherit;
