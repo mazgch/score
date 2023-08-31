@@ -5,7 +5,7 @@ Ever found yourself scribbling scores on a piece of paper or spending precious g
 ## Key Features:
 
 - **Personalize Your Game:** Set player names and their favourite color for a customized experience! Know who's in the lead with just a glance.
-- **Multiplayer Support**: Whether it's just you or a group of friends, keep track with ease - supports from single to multiple players!
+- **Multiplayer Support**: Whether it's just you or a group of friends, keep track of who is leading with ease - supports from single to multiple players!
 - **Visualize Your Progress:** Watch your score rise (or fall!) with a per-round development line graph. Perfect to gain game insights.
 - **User-Friendly Interface:** Easy to use, so you can focus on strategizing rather than tallying.
 - **Real-time Updates:** Add scores on-the-fly and see the changes immediately on the color-coded graph.
@@ -17,3 +17,5 @@ So why wait? Experience the best in board game night advancements and see who's 
 Check it out now: https://mazgch.github.io/score/
 
 If you are tired of counting manualy the score during your favourite turn based board game: this a simple webpage is your solution. 
+
+![🎲 Board Game - Score Board 🎲](demo.png)
