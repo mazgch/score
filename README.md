@@ -16,6 +16,6 @@ So why wait? Experience the best in board game night advancements and see who's 
 
 Check it out now: https://mazgch.github.io/score/
 
-If you are tired of counting manualy the score during your favourite turn based board game: this a simple webpage is your solution. 
+If you are tired of counting manualy the score during your favourite turn based board game: this simple webpage is your solution. 
 
-![🎲 Board Game - Score Board 🎲](demo.png)
+[![🎲 Board Game - Score Board 🎲](demo.png)](https://mazgch.github.io/score/)
