@@ -59,23 +59,32 @@ window.onload = function _onload() {
         }
     });
     
-    setPlayers();
-    
     window.onunload = function _onunload() {
-        document.cookie = cookieTag + JSON.stringify(players);
+        let expires = ""
+        const days = 365;
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime()+(days*24*60*60*1000));
+            expires = "; expires="+date.toGMTString();
+        }
+        const value = JSON.stringify(players);
+        document.cookie = cookieTag + value + expires + "; path=/";
     }
+    
+    setPlayers();
     
     window.setPlayers = setPlayers;
     
     function setPlayers(n) {
-        n = players.length + ((n === undefined) ? 0 : n);
-        players.length = Math.min(COLORS.length, Math.max(1,n));
+        const newLen = players.length + ((n === undefined) ? 0 : n);
+        players.length = Math.min(COLORS.length, Math.max(1,newLen));
         initChart();
         let newCell = document.createElement("TH");
         name.replaceChildren(name.firstElementChild);
         score.replaceChildren(score.firstElementChild);
-        scores.replaceChildren();
+        scores.replaceChildren(); 
         for (let p = 0; p < players.length; p ++) {
+            if (n !== undefined) players[p].score = [];
             newCell = document.createElement("TH");
             let inputCell = document.createElement("INPUT");
             inputCell.type = "text";
@@ -146,6 +155,7 @@ window.onload = function _onload() {
             if ((players[p] === undefined) || (players[p].constructor !== Object))  players[p] = { };
             if (!players[p].name)   players[p].name = "Player " + (p+1);
             if (!players[p].color)  players[p].color = COLORS[p]; 
+            if ((players[p].score === undefined) /*|| (players[p].score !== Object)*/)  players[p].score = [];
             datasets[p] = {
                 label: players[p].name,
                 fill: false,
@@ -178,26 +188,31 @@ window.onload = function _onload() {
     }
     
     function updateScore(insertRow = undefined) {
-        let sum = [];
+        let numRows = 0;
         for (let p = 0; p < players.length; p++) {
-            sum[p] = 0;
-            if ((insertRow !== undefined) && (scores.firstElementChild)) {
-                let val = scores.firstElementChild.children[p+1].firstElementChild.value;
+            numRows = Math.max(players[p].score.length, numRows);
+        }
+        for (let p = 0; p < players.length; p++) {
+            if ((insertRow !== undefined) && (numRows > 0)) {
+                let val = players[p].score[numRows - 1];
                 val = parseInt(val);
                 if (!Number.isInteger(val)) insertRow = undefined;
             }
         }
         if (insertRow !== undefined) {
-            const numRows = scores.rows.length;
+            numRows ++;
+        }
+        for (let curRows = scores.rows.length; curRows < numRows; curRows++) {
             const focusedCell = document.activeElement;
             const focusedCol = ((focusedCell && focusedCell.parentNode.tagName === "TD") && (focusedCell.cellIndex < players.length)) ? focusedCell.cellIndex + 1 : 1;
             const newRow = scores.insertRow(0);
             const newCell = newRow.insertCell();
-            newCell.textContent = "Round " + (numRows+1);
+            newCell.textContent = "Round " + (curRows+1);
             for (let p = 0; p < players.length; p++) {
                 const newCell = newRow.insertCell();
                 let inputCell = document.createElement("INPUT");
                 inputCell.type = "number";
+                inputCell.value = players[p].score[curRows];
                 inputCell.inputmode = "numeric";
                 inputCell.pattern = "[0-9]*";
                 inputCell.nextRowIx = (p + 1) % players.length;
@@ -207,7 +222,9 @@ window.onload = function _onload() {
                 inputCell.onblur = function _onblur(e) {
                     if (!inputCell.checkValidity()) {
                         inputCell.value = inputCell.oldValue;
+                        players[p].score[curRows] = inputCell.value;
                     } else {
+                        players[p].score[curRows] = inputCell.value;
                         updateScore(inputCell.nextRowIx);
                     }
                 }
@@ -221,6 +238,7 @@ window.onload = function _onload() {
                         inputCell.value = inputCell.oldValue;
                         inputCell.blur();
                     } else {
+                        players[p].score[curRows] = inputCell.value;
                         updateScore();
                     }
                 };
@@ -233,14 +251,17 @@ window.onload = function _onload() {
                 spanCell.textContent = "✏️";
                 newCell.appendChild(spanCell);
             }
-            newRow.children[insertRow + 1].firstElementChild.focus();
-            
+            if ((curRows + 1 == numRows) && (insertRow !== undefined)) {
+                newRow.children[insertRow + 1].firstElementChild.focus();
+            }
         }
-        let numRows = scores.rows.length;
-        for (let r = 0; r < numRows; r++) {
-            labels[r] = r+1;
-            for (let p = 0; p < players.length; p++) {
-                let val = scores.rows[(numRows - 1) - r].children[p+1].firstElementChild.value;
+        let sum = [];
+        for (let p = 0; p < players.length; p++) {
+            sum[p] = 0;
+            players[p].score.length = numRows;
+            for (let r = 0; r < numRows; r++) {
+                labels[r] = r+1;
+                let val = players[p].score[r];
                 val = parseInt(val);
                 if (Number.isInteger(val)) {
                     sum[p] += val;

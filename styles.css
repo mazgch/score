@@ -44,34 +44,34 @@ td {
 }
 
 /* icons */
-.iconrank,
-.iconright, 
-.iconleft {
+.iconleft,
+.iconright,
+.iconrank {
     cursor: pointer;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    opacity: 0.3; 
+}
+
+.iconleft {
+    left: 0.5em;
+    opacity: 0.4; 
+}
+
+.iconright {
+    right: 0.5em;
+    opacity: 0.4; 
+}
+
+.iconrank {
+    left: 0.5em;
+    opacity: 1; 
 }
 
 .iconleft:hover,
 .iconright:hover {
     opacity: 1; 
 }
-
-.iconleft {
-    left: 0.5em;
-}
-
-.iconright {
-    right: 0.5em;
-}
-
-.iconrank {
-    left: 0.5em;
-    opacity: 1;
-}
-
 
 /* input */
 input {
