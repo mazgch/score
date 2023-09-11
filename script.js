@@ -212,7 +212,7 @@ window.onload = function _onload() {
                 const newCell = newRow.insertCell();
                 let inputCell = document.createElement("INPUT");
                 inputCell.type = "text";
-                inputCell.value = players[p].score[curRows];
+                inputCell.value = (players[p].score[curRows] === undefined) ? "" : players[p].score[curRows];
                 inputCell.inputmode = "numeric";
                 inputCell.pattern = "[0-9]*";
                 inputCell.nextRowIx = (p + 1) % players.length;
