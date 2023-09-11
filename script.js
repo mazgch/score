@@ -211,7 +211,7 @@ window.onload = function _onload() {
             for (let p = 0; p < players.length; p++) {
                 const newCell = newRow.insertCell();
                 let inputCell = document.createElement("INPUT");
-                inputCell.type = "number";
+                inputCell.type = "text";
                 inputCell.value = players[p].score[curRows];
                 inputCell.inputmode = "numeric";
                 inputCell.pattern = "[0-9]*";
@@ -247,6 +247,7 @@ window.onload = function _onload() {
                 spanCell.className = "iconleft";
                 spanCell.onclick = function _click() { 
                     inputCell.focus();
+                    inputCell.setSelectionRange(0, inputCell.value.length);
                 };
                 spanCell.textContent = "✏️";
                 newCell.appendChild(spanCell);
