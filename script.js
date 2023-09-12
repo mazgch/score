@@ -152,10 +152,12 @@ window.onload = function _onload() {
         labels = [ 1 ];
         let ctx = document.getElementById('scoreChart').getContext('2d');
         for (let p = 0; p < players.length; p++) {
-            if ((players[p] === undefined) || (players[p].constructor !== Object))  players[p] = { };
+            if ((players[p] === undefined) || 
+                (players[p].constructor !== Object))  players[p] = { };
             if (!players[p].name)   players[p].name = "Player " + (p+1);
             if (!players[p].color)  players[p].color = COLORS[p]; 
-            if ((players[p].score === undefined) /*|| (players[p].score !== Object)*/)  players[p].score = [];
+            if ((players[p].score === undefined) || 
+                (players[p].score.constructor !== Array))  players[p].score = [];
             datasets[p] = {
                 label: players[p].name,
                 fill: false,
@@ -163,6 +165,7 @@ window.onload = function _onload() {
                 data: [ 0 ],
                 borderColor: players[p].color,
                 backgroundColor: bgndColor(players[p].color),
+                spanGaps: true
             };
         }
         chart = new Chart(ctx, {
@@ -192,56 +195,66 @@ window.onload = function _onload() {
         for (let p = 0; p < players.length; p++) {
             numRows = Math.max(players[p].score.length, numRows);
         }
-        for (let p = 0; p < players.length; p++) {
-            if ((insertRow !== undefined) && (numRows > 0)) {
-                let val = players[p].score[numRows - 1];
-                val = parseInt(val);
-                if (!Number.isInteger(val)) insertRow = undefined;
+        if (numRows > 0) {
+            for (let p = 0; (p < players.length) && (insertRow !== undefined); p++) {
+                const val = parseInt(players[p].score[numRows - 1]);
+                if (isNaN(val)) {
+                    insertRow = undefined;
+                }
             }
         }
         if (insertRow !== undefined) {
             numRows ++;
         }
-        for (let curRows = scores.rows.length; curRows < numRows; curRows++) {
+        for (let curRow = scores.rows.length; curRow < numRows; curRow++) {
             const focusedCell = document.activeElement;
             const focusedCol = ((focusedCell && focusedCell.parentNode.tagName === "TD") && (focusedCell.cellIndex < players.length)) ? focusedCell.cellIndex + 1 : 1;
             const newRow = scores.insertRow(0);
             const newCell = newRow.insertCell();
-            newCell.textContent = "Round " + (curRows+1);
+            newCell.textContent = "Round " + (curRow+1);
             for (let p = 0; p < players.length; p++) {
                 const newCell = newRow.insertCell();
                 let inputCell = document.createElement("INPUT");
                 inputCell.type = "text";
-                if (players[p].score[curRows] !== undefined) {
-                    inputCell.value = players[p].score[curRows];
+                function parseValue(val) {
+                    val = parseInt(val);
+                    return isNaN(val) ? "" : val;
                 }
+                inputCell.value  = parseValue(players[p].score[curRow]);
                 inputCell.inputmode = "numeric";
                 inputCell.pattern = "[0-9]*";
-                inputCell.nextRowIx = (p + 1) % players.length;
+                const nextRowIx = (p + 1) % players.length;
+                inputCell.discardValue = function _discardValue() {
+                    const val = parseValue(inputCell.oldValue);
+                    inputCell.value = val;
+                    players[p].score[curRow] = val;
+                }
+                inputCell.acceptValue = function _acceptValue() {
+                    players[p].score[curRow] = parseValue(inputCell.value);
+                }
                 inputCell.onfocus = function _onfocus(e) {
-                    inputCell.oldValue = inputCell.value;
+                    inputCell.oldValue = parseValue(inputCell.value);
                 }
                 inputCell.onblur = function _onblur(e) {
                     if (!inputCell.checkValidity()) {
-                        inputCell.value = inputCell.oldValue;
-                        players[p].score[curRows] = inputCell.value;
+                        inputCell.discardValue()
                         updateScore();
                     } else {
-                        players[p].score[curRows] = inputCell.value;
-                        updateScore(inputCell.nextRowIx);
+                        inputCell.acceptValue();
+                        updateScore(nextRowIx);
                     }
                 }
                 inputCell.onkeyup = function _onkeyup(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        newRow.children[inputCell.nextRowIx+1].firstElementChild.focus();
+                        newRow.children[nextRowIx+1].firstElementChild.focus();
                         inputCell.blur();
                     } else if (e.key === 'Escape') {
                         e.preventDefault();
-                        inputCell.value = inputCell.oldValue;
+                        inputCell.discardValue();
                         inputCell.blur();
                     } else {
-                        players[p].score[curRows] = inputCell.value;
+                        inputCell.acceptValue();
                         updateScore();
                     }
                 };
@@ -255,23 +268,21 @@ window.onload = function _onload() {
                 spanCell.textContent = "✏️";
                 newCell.appendChild(spanCell);
             }
-            if ((curRows + 1 == numRows) && (insertRow !== undefined)) {
+            if ((curRow + 1 == numRows) && (insertRow !== undefined)) {
                 newRow.children[insertRow + 1].firstElementChild.focus();
             }
         }
         let sum = [];
         for (let p = 0; p < players.length; p++) {
             sum[p] = 0;
-            players[p].score.length = numRows;
             for (let r = 0; r < numRows; r++) {
                 labels[r] = r+1;
-                let val = players[p].score[r];
-                val = parseInt(val);
-                if (Number.isInteger(val)) {
+                const val = parseInt(players[p].score[r]);
+                if (!isNaN(val)) {
                     sum[p] += val;
                     datasets[p].data[r] = sum[p];
-                } else if (r + 1 < numRows){
-                    datasets[p].data[r] = sum[p];
+                } else {
+                    delete datasets[p].data[r];
                 }
             }
         }
