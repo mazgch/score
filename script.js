@@ -282,7 +282,7 @@ window.onload = function _onload() {
                     sum[p] += val;
                     datasets[p].data[r] = sum[p];
                 } else {
-                    delete datasets[p].data[r];
+                    datasets[p].data[r] = NaN;
                 }
             }
         }
