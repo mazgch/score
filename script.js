@@ -123,7 +123,7 @@ window.onload = function _onload() {
                 label: players[player].name,
                 fill: false,
                 tension: 0.1,
-                data: [ 0 ],
+                data: [],
                 borderColor: players[player].color,
                 backgroundColor: bgndColor(players[player].color),
                 spanGaps: true
@@ -238,7 +238,7 @@ window.onload = function _onload() {
                 },
                 options: { 
                     scales: { 
-                        x: { beginAtZero: true, title: { text: 'Round', display: true } }, 
+                        x: { title: { text: 'Round', display: true } }, 
                         y: { beginAtZero: true, title: { text: 'Score', display: true } } 
                     },
                     maintainAspectRatio: false,
