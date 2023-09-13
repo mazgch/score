@@ -47,18 +47,19 @@ td {
 .iconleft,
 .iconright,
 .iconrank {
-    cursor: pointer;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .iconleft {
+    cursor: pointer;
     left: 0.5em;
     opacity: 0.4; 
 }
 
 .iconright {
+    cursor: pointer;
     right: 0.5em;
     opacity: 0.4; 
 }

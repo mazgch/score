@@ -2,13 +2,14 @@
 "use strict";
 
 window.onload = function _onload() {
-    let chart = undefined;
-    let labels = [];
+    let chart    = undefined;
+    let labels   = [];
     let datasets = [];
     
-    const name = document.getElementById("player");
-    const score = document.getElementById("score");
-    const scores = document.getElementById('scores');
+    const trName      = document.getElementById('player');
+    const trScore     = document.getElementById('score');
+    const tbodyScores = document.getElementById('scores');
+    
     const COLORS = [
         '#0000ff', // blue
         '#ff0000', // red
@@ -29,27 +30,45 @@ window.onload = function _onload() {
         '#9966ff', //'rgb(153, 102, 255)', // purple
         '#c9cbcf', //'rgb(201, 203, 207)'  // grey  */
     ];
+    
     function bgndColor(color) {
         const r = parseInt(color.slice(1, 3), 16); 
         const g = parseInt(color.slice(3, 5), 16); 
         const b = parseInt(color.slice(5, 7), 16);
-        return "rgba(" + r + "," + g + "," + b + ",0.5)";
+        return 'rgba(' + r + ',' + g + ',' + b + ',0.5)';
     }
 
     function textColor(color) {
         const r = parseInt(color.slice(1, 3), 16); 
         const g = parseInt(color.slice(3, 5), 16); 
         const b = parseInt(color.slice(5, 7), 16);
-        const max = Math.max(r,g,b);
-        const min = Math.min(r,g,b);
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
         const lightness = (min + max) / 2;
-        return (lightness >= 127) ? "#000000" : "#ffffff";
+        return (lightness >= 127) ? '#000000' : '#ffffff';
     }
 
+    function createEditIcon() {
+        const icon = document.createElement('SPAN');
+        icon.className = 'iconleft';
+        icon.textContent = '✏️'; // pen emoji
+        icon.onclick = function _onClick(e) {
+            const input = this.closest('TD, TH').querySelector('INPUT[type="text"]');
+            input.focus();
+            input.setSelectionRange(0, input.value.length);
+        };
+        return icon;
+    }
+
+    function parseValue(val) {
+        val = parseInt(val);
+        return isNaN(val) ? '' : val;
+    }
+    
     feather.replace();
 
-    const cookieTag = "players=";
-    let players = [ undefined, undefined ]; // default 2 Players 
+    const cookieTag = 'players=';
+    let players = new Array(2); // default 2 Players 
     document.cookie.split(';').forEach( function _cookie(cookie) {
         try {
             if (cookie.startsWith(cookieTag)) {
@@ -59,241 +78,240 @@ window.onload = function _onload() {
         }
     });
     
-    window.onunload = function _onunload() {
-        let expires = ""
+    window.onunload = function _onunload(e) {
+        let expires = '';
         const days = 365;
         if (days) {
             var date = new Date();
             date.setTime(date.getTime()+(days*24*60*60*1000));
-            expires = "; expires="+date.toGMTString();
+            expires = '; expires=' + date.toGMTString();
         }
         const value = JSON.stringify(players);
-        document.cookie = cookieTag + value + expires + "; path=/";
+        document.cookie = cookieTag + value + expires + '; path=/';
     }
     
     setPlayers();
-    
     window.setPlayers = setPlayers;
-    
-    function setPlayers(n) {
-        const newLen = players.length + ((n === undefined) ? 0 : n);
-        players.length = Math.min(COLORS.length, Math.max(1,newLen));
-        initChart();
-        let newCell = document.createElement("TH");
-        name.replaceChildren(name.firstElementChild);
-        score.replaceChildren(score.firstElementChild);
-        scores.replaceChildren(); 
-        for (let p = 0; p < players.length; p ++) {
-            if (n !== undefined) players[p].score = [];
-            newCell = document.createElement("TH");
-            let inputCell = document.createElement("INPUT");
-            inputCell.type = "text";
-            inputCell.value = players[p].name;
-            inputCell.onkeyup = updateScore;
-            inputCell.style.borderColor = players[p].color;
-            //inputCell.style.color = textColor(players[p].color);
-            inputCell.style.backgroundColor = bgndColor(players[p].color);
-            inputCell.onchange = function _onchangeName(e) {
-                const name = inputCell.value;
-                players[p].name = name;
-                datasets[p].label = name;
-                chart.update();
-            }
-            newCell.appendChild(inputCell);
-            let spanCell = document.createElement("SPAN");
-            spanCell.className = "iconleft";
-            spanCell.onclick = function _onclickName(e) { 
-                inputCell.focus(); 
-                inputCell.setSelectionRange(0, inputCell.value.length);
-            };
-            spanCell.textContent = "✏️";
-            newCell.appendChild(spanCell);
-            spanCell = document.createElement("SPAN");
-            spanCell.className = "iconright";
-            spanCell.textContent = "🎨";
-            let inputColor = document.createElement('INPUT');
-            inputColor.type = 'color';
-            inputColor.style.opacity = "0";
-            inputColor.onchange = function _onchangeColor(e) {
-                const color = inputColor.value;
-                players[p].color = color;
-                datasets[p].borderColor = color;
-                inputCell.style.borderColor = color;
-                //inputCell.style.color = textColor(color);
-                const background = bgndColor(color);
-                datasets[p].backgroundColor = background; 
-                inputCell.style.backgroundColor = background;
-                chart.update();
-            };
-            spanCell.appendChild(inputColor);
-            spanCell.onclick = function _onclickColor(e) {
-                inputColor.value = datasets[p].borderColor; 
-                inputColor.focus(); 
-            };
-            newCell.appendChild(spanCell);
-            name.appendChild(newCell);
-            newCell = document.createElement("TH");
-            newCell.textContent = 0;
-            let rankCell = document.createElement("SPAN");
-            rankCell.className = "iconrank";
-            rankCell.textContent = "";
-            newCell.appendChild(rankCell);
-            score.appendChild(newCell);
-        }
-        updateScore(0);
-    }
 
-    function initChart() {
+    function setPlayers(addPlayers) {
+        const newLen = players.length + ((addPlayers === undefined) ? 0 : addPlayers);
+        players.length = Math.min(COLORS.length, Math.max(1, newLen));
+        // destroy the chart and reset the player struture and the datasets 
         if (chart !== undefined) {
             chart.destroy();
+            chart = undefined;
         }
-        chart = undefined;
         datasets = [];
         labels = [ 1 ];
-        let ctx = document.getElementById('scoreChart').getContext('2d');
-        for (let p = 0; p < players.length; p++) {
-            if ((players[p] === undefined) || 
-                (players[p].constructor !== Object))  players[p] = { };
-            if (!players[p].name)   players[p].name = "Player " + (p+1);
-            if (!players[p].color)  players[p].color = COLORS[p]; 
-            if ((players[p].score === undefined) || 
-                (players[p].score.constructor !== Array))  players[p].score = [];
-            datasets[p] = {
-                label: players[p].name,
+        for (let player = 0; player < players.length; player++) {
+            if ((players[player] === undefined) || 
+                (players[player].constructor !== Object)) {
+                 players[player] = { };
+            }
+            if (!players[player].name) {
+                players[player].name = 'Player ' + (player+1);
+            }
+            if (!players[player].color) {
+                players[player].color = COLORS[player]; 
+            }
+            if ((addPlayers !== undefined) || 
+                (players[player].score === undefined) || 
+                (players[player].score.constructor !== Array)) {
+                players[player].score = [];
+            }
+            datasets[player] = {
+                label: players[player].name,
                 fill: false,
                 tension: 0.1,
                 data: [ 0 ],
-                borderColor: players[p].color,
-                backgroundColor: bgndColor(players[p].color),
+                borderColor: players[player].color,
+                backgroundColor: bgndColor(players[player].color),
                 spanGaps: true
             };
         }
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: datasets
-            },
-            options: { 
-                scales: { 
-                    x: { beginAtZero: true, title: { text: "Round", display: true } }, 
-                    y: { beginAtZero: true, title: { text: "Score", display: true } } 
-                },
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                }
+        // reset the table clear players data and score rows 
+        trName.replaceChildren(trName.firstElementChild);
+        trScore.replaceChildren(trScore.firstElementChild);
+        tbodyScores.replaceChildren(); 
+        for (let player = 0; player < players.length; player ++) {
+            const input = document.createElement('INPUT');
+            input.type = 'text';
+            input.value = players[player].name;
+            input.player = player;
+            input.onkeyup = function _onKeyUp(e) {
+                updateScore();
             }
-        });
-        chart.update();
+            input.style.borderColor = players[player].color;
+            input.style.backgroundColor = bgndColor(players[player].color);
+            input.onchange = function _onChangeName(e) {
+                const name = this.value;
+                players[this.player].name = name;
+                datasets[this.player].label = name;
+                chart.update();
+            }
+            // the color input selector (not visible)
+            const inputColor = document.createElement('INPUT');
+            inputColor.type = 'color';
+            inputColor.style.opacity = 0;
+            inputColor.onchange = function _onChangeColor(e) {
+                const input = this.closest('TH').querySelector('input[type="text"]');
+                const color = this.value;
+                players[input.player].color = color;
+                datasets[input.player].borderColor = color;
+                input.style.borderColor = color;
+                const background = bgndColor(color);
+                datasets[input.player].backgroundColor = background; 
+                input.style.backgroundColor = background;
+                chart.update();
+            };
+            // color right icon
+            const iconColor = document.createElement('SPAN');
+            iconColor.className = 'iconright';
+            iconColor.textContent = '🎨'; // palette emoji
+            iconColor.onclick = function _onClickColor(e) {
+                const input = this.closest('TH').querySelector('input[type="color"]');
+                input.value = datasets[input.player].borderColor; 
+                input.focus();
+            };
+            // <th><input ...>name</input><span ...>icon</span><span ...>icon<input>color</input></span><th>
+            const thName = document.createElement('TH');
+            thName.appendChild(input);
+            thName.appendChild(createEditIcon());
+            iconColor.appendChild(inputColor);
+            thName.appendChild(iconColor);
+            trName.appendChild(thName);
+            // the score <th>score<span ...>icon></span></th>
+            const thScore = document.createElement('TH');
+            thScore.textContent = '0'; // zero score
+            const iconRank = document.createElement('SPAN');
+            iconRank.className = 'iconrank';
+            iconRank.textContent = '';
+            thScore.appendChild(iconRank);
+            // add to row
+            trScore.appendChild(thScore);
+        }
+        updateScore();
     }
-    
-    function updateScore(insertRow = undefined) {
-        let numRows = 0;
-        for (let p = 0; p < players.length; p++) {
-            numRows = Math.max(players[p].score.length, numRows);
-        }
-        if (numRows > 0) {
-            for (let p = 0; (p < players.length) && (insertRow !== undefined); p++) {
-                const val = parseInt(players[p].score[numRows - 1]);
-                if (isNaN(val)) {
-                    insertRow = undefined;
-                }
+
+    function updateScore() {
+        let numRows = 1; // at least space for one complete row 
+        for (let player = 0; player < players.length; player++) {
+            const len = players[player].score.length;
+            if (len > 0) {
+                const val = parseInt(players[player].score[len - 1]);
+                numRows = Math.max(numRows, len + (isNaN(val) ? 0 : 1));
             }
         }
-        if (insertRow !== undefined) {
-            numRows ++;
-        }
-        for (let curRow = scores.rows.length; curRow < numRows; curRow++) {
-            const focusedCell = document.activeElement;
-            const focusedCol = ((focusedCell && focusedCell.parentNode.tagName === "TD") && (focusedCell.cellIndex < players.length)) ? focusedCell.cellIndex + 1 : 1;
-            const newRow = scores.insertRow(0);
-            const newCell = newRow.insertCell();
-            newCell.textContent = "Round " + (curRow+1);
-            for (let p = 0; p < players.length; p++) {
-                const newCell = newRow.insertCell();
-                let inputCell = document.createElement("INPUT");
-                inputCell.type = "text";
-                function parseValue(val) {
-                    val = parseInt(val);
-                    return isNaN(val) ? "" : val;
-                }
-                inputCell.value  = parseValue(players[p].score[curRow]);
-                inputCell.inputmode = "numeric";
-                inputCell.pattern = "[0-9]*";
-                const nextRowIx = (p + 1) % players.length;
-                inputCell.discardValue = function _discardValue() {
-                    const val = parseValue(inputCell.oldValue);
-                    inputCell.value = val;
-                    players[p].score[curRow] = val;
-                }
-                inputCell.acceptValue = function _acceptValue() {
-                    players[p].score[curRow] = parseValue(inputCell.value);
-                }
-                inputCell.onfocus = function _onfocus(e) {
-                    inputCell.oldValue = parseValue(inputCell.value);
-                }
-                inputCell.onblur = function _onblur(e) {
-                    if (!inputCell.checkValidity()) {
-                        inputCell.discardValue()
-                        updateScore();
-                    } else {
-                        inputCell.acceptValue();
-                        updateScore(nextRowIx);
-                    }
-                }
-                inputCell.onkeyup = function _onkeyup(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        newRow.children[nextRowIx+1].firstElementChild.focus();
-                        inputCell.blur();
-                    } else if (e.key === 'Escape') {
-                        e.preventDefault();
-                        inputCell.discardValue();
-                        inputCell.blur();
-                    } else {
-                        inputCell.acceptValue();
-                        updateScore();
-                    }
-                };
-                newCell.appendChild(inputCell);
-                let spanCell = document.createElement("SPAN");
-                spanCell.className = "iconleft";
-                spanCell.onclick = function _click() { 
-                    inputCell.focus();
-                    inputCell.setSelectionRange(0, inputCell.value.length);
-                };
-                spanCell.textContent = "✏️";
-                newCell.appendChild(spanCell);
-            }
-            if ((curRow + 1 == numRows) && (insertRow !== undefined)) {
-                newRow.children[insertRow + 1].firstElementChild.focus();
-            }
-        }
+        // calc the cumulative sums and update the chart (datasets + label)
         let sum = [];
-        for (let p = 0; p < players.length; p++) {
-            sum[p] = 0;
-            for (let r = 0; r < numRows; r++) {
-                labels[r] = r+1;
-                const val = parseInt(players[p].score[r]);
+        const numRounds = numRows - 1;
+        for (let player = 0; player < players.length; player++) {
+            sum[player] = 0;
+            for (let round = 0; round < numRounds; round++) {
+                labels[round] = 1 + round;
+                const val = parseInt(players[player].score[round]);
                 if (!isNaN(val)) {
-                    sum[p] += val;
-                    datasets[p].data[r] = sum[p];
+                    sum[player] += val;
+                    datasets[player].data[round] = sum[player];
                 } else {
-                    datasets[p].data[r] = NaN;
+                    datasets[player].data[round] = NaN;
                 }
             }
         }
+        // update the score 
         const sortedSum = [...sum].sort((a, b) => b - a);
         const rank = sum.map(s => sortedSum.indexOf(s));
-        for (let p = 0; p < players.length; p++) {
-            score.children[p+1].firstChild.textContent = sum[p];
-            const medals = [ "🥇", "🥈", "🥉" ];
-            const medal = (medals[rank[p]] !== undefined) ? medals[rank[p]] : "";
-            score.children[p+1].firstElementChild.textContent = medal;
+        for (let player = 0; player < players.length; player++) {
+            const medals = [ '🥇', '🥈', '🥉' ]; // medal emojis
+            const medal = (medals[rank[player]] !== undefined) ? medals[rank[player]] : '';
+            trScore.cells[1 + player].firstChild.textContent = sum[player];
+            trScore.cells[1 + player].querySelector('SPAN').textContent = medal;
+        }
+        // create the chart if not yet done
+        if (chart === undefined) {
+            let ctx = document.getElementById('scoreChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: { 
+                    scales: { 
+                        x: { beginAtZero: true, title: { text: 'Round', display: true } }, 
+                        y: { beginAtZero: true, title: { text: 'Score', display: true } } 
+                    },
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false,
+                        }
+                    }
+                }
+            });
         }
         chart.update();
+        // add as many rows as needed
+        for (let row = tbodyScores.rows.length; row < numRows; row++) {
+            const tr = tbodyScores.insertRow(0);
+            const td = tr.insertCell();
+            td.textContent = 'Round ' + (row+1);
+            for (let player = 0; player < players.length; player++) {
+                // we build <td><input ... >score</input><span ... >icon</span></td>
+                const input = document.createElement('INPUT');
+                input.type = 'text';
+                input.inputmode = 'numeric';
+                input.pattern = '[0-9]*';
+                input.player = player;
+                input.round = row;
+                input.value  = parseValue(players[player].score[row]);
+                input.discardValue = function _discardValue() {
+                    const val = parseValue(this.oldValue);
+                    this.value = val;
+                    players[this.player].score[this.round] = val;
+                }
+                input.acceptValue = function _acceptValue() {
+                    players[this.player].score[this.round] = parseValue(this.value);
+                }
+                input.onfocus = function _onfocus(e) {
+                    this.oldValue = parseValue(this.value);
+                }
+                input.onblur = function _onblur(e) {
+                    if (!this.checkValidity()) {
+                        this.discardValue()
+                        updateScore();
+                    } else {
+                        this.acceptValue();
+                        updateScore();
+                    }
+                }
+                input.onkeyup = function _onkeyup(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // advance the cell or row
+                        const nextPlayer = (this.player + 1) % players.length;
+                        const tr = this.closest('TR');
+                        let nextInput = tr.cells[1 + nextPlayer].querySelector(this.tagName);
+                        if ((nextInput.value != '') && (tr === tbodyScores.rows[1])) {
+                            nextInput = tbodyScores.rows[0].cells[1 + nextPlayer].querySelector(this.tagName);
+                        }
+                        if(nextInput.value == '') {
+                            nextInput.focus();
+                        }
+                        this.blur();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        this.discardValue();
+                        this.blur();
+                    } else {
+                        this.acceptValue();
+                        updateScore();
+                    }
+                };
+                const td = tr.insertCell();
+                td.appendChild(input);
+                td.appendChild(createEditIcon());
+            }
+        }
     }
 };
