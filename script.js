@@ -68,9 +68,8 @@ window.onload = function _onload() {
             }
             datasets[player] = {
                 label: players[player].name,
-                fill: false,
-                tension: 0.1,
                 data: [],
+                tension: 0.1,
                 borderColor: players[player].color,
                 backgroundColor: bgndColor(players[player].color),
                 spanGaps: true
@@ -169,8 +168,8 @@ window.onload = function _onload() {
         // update the score 
         const sortedSum = [...sum].sort((a, b) => b - a);
         const rank = sum.map(s => sortedSum.indexOf(s));
+        const medals = [ '🥇', '🥈', '🥉' ]; // medal emojis
         for (let player = 0; player < players.length; player++) {
-            const medals = [ '🥇', '🥈', '🥉' ]; // medal emojis
             const medal = (medals[rank[player]] !== undefined) ? medals[rank[player]] : '';
             trScore.cells[1 + player].firstChild.textContent = sum[player];
             trScore.cells[1 + player].querySelector('SPAN').textContent = medal;
@@ -178,13 +177,17 @@ window.onload = function _onload() {
         // create the chart if not yet done
         if (chart === undefined) {
             const ctx = document.getElementById('chart').getContext('2d');
-            chart = new Chart(ctx, {
+            const config = {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: datasets
+                    datasets: datasets,
                 },
                 options: { 
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
                     scales: { 
                         x: { title: { text: 'Round', display: true } }, 
                         y: { beginAtZero: true, title: { text: 'Score', display: true } } 
@@ -193,10 +196,23 @@ window.onload = function _onload() {
                     plugins: {
                         legend: {
                             display: false,
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return 'Round ' + context[0].label;
+                                },
+                            },
+                            itemSort: function(item0, item1) {
+                                var y0 = item0.raw;
+                                var y1 = item1.raw;
+                                return (y0 < y1) ? +1 : (y0 > y1) ? -1 : 0;
+                            }
                         }
                     }
                 }
-            });
+            };
+            chart = new Chart(ctx, config);
         }
         chart.update();
         // add as many rows as needed
