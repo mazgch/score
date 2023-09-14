@@ -3,13 +3,11 @@
 
 window.onload = function _onload() {
     let chart    = undefined;
-    let labels   = [];
-    let datasets = [];
+    let players = new Array(2); // default 2 Players 
+    const labels   = [];
+    const datasets = [];
     
-    const trName      = document.getElementById('player');
-    const trScore     = document.getElementById('score');
-    const tbodyScores = document.getElementById('scores');
-    
+    const COOKIETAG = 'players=';
     const COLORS = [
         '#0000ff', // blue
         '#ff0000', // red
@@ -31,68 +29,17 @@ window.onload = function _onload() {
         '#c9cbcf', //'rgb(201, 203, 207)'  // grey  */
     ];
     
-    function bgndColor(color) {
-        const r = parseInt(color.slice(1, 3), 16); 
-        const g = parseInt(color.slice(3, 5), 16); 
-        const b = parseInt(color.slice(5, 7), 16);
-        return 'rgba(' + r + ',' + g + ',' + b + ',0.5)';
-    }
-
-    function textColor(color) {
-        const r = parseInt(color.slice(1, 3), 16); 
-        const g = parseInt(color.slice(3, 5), 16); 
-        const b = parseInt(color.slice(5, 7), 16);
-        const max = Math.max(r, g, b);
-        const min = Math.min(r, g, b);
-        const lightness = (min + max) / 2;
-        return (lightness >= 127) ? '#000000' : '#ffffff';
-    }
-
-    function createEditIcon() {
-        const icon = document.createElement('SPAN');
-        icon.className = 'iconleft';
-        icon.textContent = '✏️'; // pen emoji
-        icon.onclick = function _onClick(e) {
-            const input = this.closest('TD, TH').querySelector('INPUT[type="text"]');
-            input.focus();
-            input.setSelectionRange(0, input.value.length);
-        };
-        return icon;
-    }
-
-    function parseValue(val) {
-        val = parseInt(val);
-        return isNaN(val) ? '' : val;
-    }
-    
     feather.replace();
-
-    const cookieTag = 'players=';
-    let players = new Array(2); // default 2 Players 
-    document.cookie.split(';').forEach( function _cookie(cookie) {
-        try {
-            if (cookie.startsWith(cookieTag)) {
-                players = JSON.parse(cookie.substring(cookieTag.length));
-            }
-        } catch (e) {
-        }
-    });
-    
+    const trName      = document.getElementById('player');
+    const trScore     = document.getElementById('score');
+    const tbodyScores = document.getElementById('scores');
+    window.setPlayers = setPlayers; // will be called by html
     window.onunload = function _onunload(e) {
-        let expires = '';
-        const days = 365;
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime()+(days*24*60*60*1000));
-            expires = '; expires=' + date.toGMTString();
-        }
-        const value = JSON.stringify(players);
-        document.cookie = cookieTag + value + expires + '; path=/';
+        document.cookie = storeCookie();
     }
-    
+    document.cookie.split(';').forEach( cookie => parseCookie(cookie) );
     setPlayers();
-    window.setPlayers = setPlayers;
-
+    
     function setPlayers(addPlayers) {
         const newLen = players.length + ((addPlayers === undefined) ? 0 : addPlayers);
         players.length = Math.min(COLORS.length, Math.max(1, newLen));
@@ -101,8 +48,8 @@ window.onload = function _onload() {
             chart.destroy();
             chart = undefined;
         }
-        datasets = [];
-        labels = [ 1 ];
+        datasets.length = 0;
+        labels.length = 1;
         for (let player = 0; player < players.length; player++) {
             if ((players[player] === undefined) || 
                 (players[player].constructor !== Object)) {
@@ -138,11 +85,11 @@ window.onload = function _onload() {
             input.type = 'text';
             input.value = players[player].name;
             input.player = player;
+            input.style.borderColor = players[player].color;
+            input.style.backgroundColor = bgndColor(players[player].color);
             input.onkeyup = function _onKeyUp(e) {
                 updateScore();
             }
-            input.style.borderColor = players[player].color;
-            input.style.backgroundColor = bgndColor(players[player].color);
             input.onchange = function _onChangeName(e) {
                 const name = this.value;
                 players[this.player].name = name;
@@ -153,8 +100,9 @@ window.onload = function _onload() {
             const inputColor = document.createElement('INPUT');
             inputColor.type = 'color';
             inputColor.style.opacity = 0;
+            inputColor.player = player;
             inputColor.onchange = function _onChangeColor(e) {
-                const input = this.closest('TH').querySelector('input[type="text"]');
+                const input = this.closest('TH').querySelector('INPUT[type="text"]');
                 const color = this.value;
                 players[input.player].color = color;
                 datasets[input.player].borderColor = color;
@@ -169,8 +117,8 @@ window.onload = function _onload() {
             iconColor.className = 'iconright';
             iconColor.textContent = '🎨'; // palette emoji
             iconColor.onclick = function _onClickColor(e) {
-                const input = this.closest('TH').querySelector('input[type="color"]');
-                input.value = datasets[input.player].borderColor; 
+                const input = this.closest('TH').querySelector('INPUT[type="color"]');
+                input.value = players[input.player].color;
                 input.focus();
             };
             // <th><input ...>name</input><span ...>icon</span><span ...>icon<input>color</input></span><th>
@@ -191,7 +139,7 @@ window.onload = function _onload() {
             trScore.appendChild(thScore);
         }
         updateScore();
-    }
+    };
 
     function updateScore() {
         let numRows = 1; // at least space for one complete row 
@@ -203,7 +151,7 @@ window.onload = function _onload() {
             }
         }
         // calc the cumulative sums and update the chart (datasets + label)
-        let sum = [];
+        const sum = [];
         const numRounds = numRows - 1;
         for (let player = 0; player < players.length; player++) {
             sum[player] = 0;
@@ -229,7 +177,7 @@ window.onload = function _onload() {
         }
         // create the chart if not yet done
         if (chart === undefined) {
-            let ctx = document.getElementById('scoreChart').getContext('2d');
+            const ctx = document.getElementById('chart').getContext('2d');
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -307,11 +255,66 @@ window.onload = function _onload() {
                         this.acceptValue();
                         updateScore();
                     }
-                };
+                }
                 const td = tr.insertCell();
                 td.appendChild(input);
                 td.appendChild(createEditIcon());
             }
         }
     }
+    
+    function createEditIcon() {
+        const icon = document.createElement('SPAN');
+        icon.className = 'iconleft';
+        icon.textContent = '✏️'; // pen emoji
+        icon.onclick = function _onClick(e) {
+            const input = this.closest('TD, TH').querySelector('INPUT[type="text"]');
+            input.focus();
+            input.setSelectionRange(0, input.value.length);
+        };
+        return icon;
+    }
+
+    function parseValue(val) {
+        val = parseInt(val);
+        return isNaN(val) ? '' : val;
+    }
+
+    function parseCookie(cookie) {
+        try {
+            if (cookie.startsWith(COOKIETAG)) {
+                players = JSON.parse(cookie.substring(COOKIETAG.length));
+            }
+        } catch (e) {
+        }
+    }
+
+    function storeCookie(days = 365) {
+        let expires = '';
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime()+(days*24*60*60*1000));
+            expires = '; expires=' + date.toGMTString();
+        }
+        const value = JSON.stringify(players);
+        return COOKIETAG + value + expires + '; path=/';
+    }
+
+    function bgndColor(color) {
+        const r = parseInt(color.slice(1, 3), 16); 
+        const g = parseInt(color.slice(3, 5), 16); 
+        const b = parseInt(color.slice(5, 7), 16);
+        return 'rgba(' + r + ',' + g + ',' + b + ',0.5)';
+    }
+
+    function textColor(color) {
+        const r = parseInt(color.slice(1, 3), 16); 
+        const g = parseInt(color.slice(3, 5), 16); 
+        const b = parseInt(color.slice(5, 7), 16);
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const lightness = (min + max) / 2;
+        return (lightness >= 127) ? '#000000' : '#ffffff';
+    }
+    
 };

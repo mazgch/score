@@ -99,7 +99,7 @@ input:focus {
 } 
 
 input[pattern]:invalid {
-    color: red; /* Light red */
+    color: red;
 }
 
 input::-webkit-outer-spin-button,
