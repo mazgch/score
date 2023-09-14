@@ -106,13 +106,8 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-input[type=number] {
-  -moz-appearance: textfield;
-}
 
 @keyframes blink_input_focus {
     0% { opacity: 0; }
     100% { opacity: 1; }
 }
-
-
