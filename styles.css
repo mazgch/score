@@ -33,6 +33,10 @@ tbody tr:nth-child(even) {
     background: #f4f4f4;
 }
 
+tbody tr[highlight] {
+    background: #e0e0e0;
+}
+
 th,
 td {
     height: 2em;
@@ -66,6 +70,7 @@ td {
 .iconrank {
     left: 0.5em;
     opacity: 1; 
+    cursor: default;
 }
 
 .iconleft:hover,

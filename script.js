@@ -7,6 +7,7 @@ window.onload = function _onload() {
     const labels   = [];
     const datasets = [];
     
+    const ROUNDTEXT = 'Round';
     const COOKIETAG = 'players=';
     const COLORS = [
         '#0000ff', // blue
@@ -19,14 +20,6 @@ window.onload = function _onload() {
         '#942192', // purple
         '#aa7942', // brown
         '#919191', // gray
-/*      // chart.js default palette
-        '#36a2eb', //'rgb(54, 162, 235)',  // blue
-        '#ff6384', //'rgb(255, 99, 132)',  // red
-        '#ffcd56', //'rgb(255, 205, 86)',  // yellow
-        '#4bc0c0', //'rgb(75, 192, 192)',  // green
-        '#ff9f40', //'rgb(255, 159, 64)',  // orange
-        '#9966ff', //'rgb(153, 102, 255)', // purple
-        '#c9cbcf', //'rgb(201, 203, 207)'  // grey  */
     ];
     
     feather.replace();
@@ -41,6 +34,10 @@ window.onload = function _onload() {
     setPlayers();
     
     function setPlayers(addPlayers) {
+        if ((addPlayers < 0) && (tbodyScores.rows.length > 1)) {
+            if (!confirm('You will obviously lose the score of the last player.\nDo you want to proceed?'))
+                return;
+        }
         const newLen = players.length + ((addPlayers === undefined) ? 0 : addPlayers);
         players.length = Math.min(COLORS.length, Math.max(1, newLen));
         // destroy the chart and reset the player struture and the datasets 
@@ -61,7 +58,7 @@ window.onload = function _onload() {
             if (!players[player].color) {
                 players[player].color = COLORS[player]; 
             }
-            if ((addPlayers !== undefined) || 
+            if ((addPlayers === 0 /* trash bin button */) || 
                 (players[player].score === undefined) || 
                 (players[player].score.constructor !== Array)) {
                 players[player].score = [];
@@ -114,6 +111,7 @@ window.onload = function _onload() {
             // color right icon
             const iconColor = document.createElement('SPAN');
             iconColor.className = 'iconright';
+            iconColor.title = 'Change the player color';
             iconColor.textContent = '🎨'; // palette emoji
             iconColor.onclick = function _onClickColor(e) {
                 const input = this.closest('TH').querySelector('INPUT[type="color"]');
@@ -123,7 +121,7 @@ window.onload = function _onload() {
             // <th><input ...>name</input><span ...>icon</span><span ...>icon<input>color</input></span><th>
             const thName = document.createElement('TH');
             thName.appendChild(input);
-            thName.appendChild(createEditIcon());
+            thName.appendChild(createEditIcon('Edit the player name.'));
             iconColor.appendChild(inputColor);
             thName.appendChild(iconColor);
             trName.appendChild(thName);
@@ -167,12 +165,20 @@ window.onload = function _onload() {
         }
         // update the score 
         const sortedSum = [...sum].sort((a, b) => b - a);
-        const rank = sum.map(s => sortedSum.indexOf(s));
-        const medals = [ '🥇', '🥈', '🥉' ]; // medal emojis
+        const ranks = sum.map(s => sortedSum.indexOf(s));
+        const MEDALS = [ '🥇', '🥈', '🥉' ]; // medal emojis
+        const RANKS  = [ 'first', 'second',  'third',  'fourth', 'fifth',
+                         'sixth', 'seventh', 'eighth', 'ninth',  'tenth' ];
+        const last = Math.max(...ranks);
         for (let player = 0; player < players.length; player++) {
-            const medal = (medals[rank[player]] !== undefined) ? medals[rank[player]] : '';
+            const rank = ranks[player];
+            const medal = (MEDALS[rank] !== undefined) ? MEDALS[rank] : 
+                          (rank == last)  ? '🤞' : ''; // 🍀😢🫣🤞
             trScore.cells[1 + player].firstChild.textContent = sum[player];
-            trScore.cells[1 + player].querySelector('SPAN').textContent = medal;
+            const icon = trScore.cells[1 + player].querySelector('SPAN');
+            icon.textContent = medal;
+            const rankText = (rank == last) ? 'last' : RANKS[rank];
+            icon.title = rankText ? 'Player is currently in the ' + rankText + ' rank.': '';
         }
         // create the chart if not yet done
         if (chart === undefined) {
@@ -189,7 +195,7 @@ window.onload = function _onload() {
                         mode: 'index',
                     },
                     scales: { 
-                        x: { title: { text: 'Round', display: true } }, 
+                        x: { title: { text: ROUNDTEXT, display: true } }, 
                         y: { beginAtZero: true, title: { text: 'Score', display: true } } 
                     },
                     maintainAspectRatio: false,
@@ -200,7 +206,7 @@ window.onload = function _onload() {
                         tooltip: {
                             callbacks: {
                                 title: function(context) {
-                                    return 'Round ' + context[0].label;
+                                    return ROUNDTEXT + ' ' + context[0].label;
                                 },
                             },
                             itemSort: function(item0, item1) {
@@ -213,13 +219,25 @@ window.onload = function _onload() {
                 }
             };
             chart = new Chart(ctx, config);
+            function _onMouseMove(e) {
+                const points = chart.getElementsAtEventForMode(e, 'index', {intersect: false}, true);
+                const trs = tbodyScores.querySelectorAll('tr');
+                trs.forEach((tr) => { tr.removeAttribute('highlight'); })
+                if (points[0] && (trs.length > 0)) {
+                    const index = trs.length - 1 - points[0].index;
+                    if (index > 0 && index < trs.length)
+                    trs[index].setAttribute('highlight','');
+                }
+            }
+            chart.canvas.onmousemove = _onMouseMove;
+            chart.canvas.onmouseleave = _onMouseMove;
         }
         chart.update();
         // add as many rows as needed
         for (let row = tbodyScores.rows.length; row < numRows; row++) {
             const tr = tbodyScores.insertRow(0);
             const td = tr.insertCell();
-            td.textContent = 'Round ' + (row+1);
+            td.textContent = ROUNDTEXT + ' ' + (row+1);
             for (let player = 0; player < players.length; player++) {
                 // we build <td><input ... >score</input><span ... >icon</span></td>
                 const input = document.createElement('INPUT');
@@ -274,12 +292,12 @@ window.onload = function _onload() {
                 }
                 const td = tr.insertCell();
                 td.appendChild(input);
-                td.appendChild(createEditIcon());
+                td.appendChild(createEditIcon("Edit this score."));
             }
         }
     }
     
-    function createEditIcon() {
+    function createEditIcon(hint) {
         const icon = document.createElement('SPAN');
         icon.className = 'iconleft';
         icon.textContent = '✏️'; // pen emoji
@@ -288,6 +306,9 @@ window.onload = function _onload() {
             input.focus();
             input.setSelectionRange(0, input.value.length);
         };
+        if (hint !== undefined) {
+            icon.title = hint;
+        }
         return icon;
     }
 
