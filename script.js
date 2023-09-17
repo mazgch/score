@@ -173,7 +173,7 @@ window.onload = function _onload() {
         for (let player = 0; player < players.length; player++) {
             const rank = ranks[player];
             const medal = (MEDALS[rank] !== undefined) ? MEDALS[rank] : 
-                          (rank == last)  ? '🤞' : ''; // 🍀😢🫣🤞
+                          (rank == last)  ? '🤞' : '';
             trScore.cells[1 + player].firstChild.textContent = sum[player];
             const icon = trScore.cells[1 + player].querySelector('SPAN');
             icon.textContent = medal;
