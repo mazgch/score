@@ -3,24 +3,24 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <title>🎲 Board Game - Score Board 🎲</title>
+        <title>🎲 Board Game - Scoreboard 🎲</title>
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <h3>🎲 Board Game - Score Board 🎲</h3> 
+        <h3>🎲 Board Game - Scoreboard 🎲</h3> 
         <div style="height:300px"><canvas id="chart"></canvas></div>
         <table id="table">
             <thead>
                 <tr id="player">
                     <th>
-                        <span class="iconleft" title="Remove the last player from the score board." onclick="window.setPlayers(-1);">➖</span>
+                        <span class="iconleft" title="Remove the last player from the scoreboard." onclick="window.setPlayers(-1);">➖</span>
                         Player
-                        <span class="iconright" title="Add a player to the score board." onclick="window.setPlayers(+1);">➕</span>
+                        <span class="iconright" title="Add another player to the scoreboard." onclick="window.setPlayers(+1);">➕</span>
                     </th>
                 </tr>
                 <tr id="score">   
                     <th>
-                        <span class="iconleft" title="Clear the score board." onclick="window.setPlayers(0);">🗑️</span>
+                        <span class="iconleft" title="Clear the scoreboard." onclick="window.setPlayers(0);">🗑️</span>
                         Score
                     </th>
                 </tr>

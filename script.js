@@ -111,7 +111,7 @@ window.onload = function _onload() {
             // color right icon
             const iconColor = document.createElement('SPAN');
             iconColor.className = 'iconright';
-            iconColor.title = 'Change the player color';
+            iconColor.title = 'Change this player\'s color';
             iconColor.textContent = '🎨'; // palette emoji
             iconColor.onclick = function _onClickColor(e) {
                 const input = this.closest('TH').querySelector('INPUT[type="color"]');
@@ -121,7 +121,7 @@ window.onload = function _onload() {
             // <th><input ...>name</input><span ...>icon</span><span ...>icon<input>color</input></span><th>
             const thName = document.createElement('TH');
             thName.appendChild(input);
-            thName.appendChild(createEditIcon('Edit the player name.'));
+            thName.appendChild(createEditIcon('Edit this player\'s name.'));
             iconColor.appendChild(inputColor);
             thName.appendChild(iconColor);
             trName.appendChild(thName);

@@ -1,4 +1,4 @@
-# 🎲 Board Game - Score Board 🎲
+# 🎲 Board Game - Scoreboard 🎲
 
 Ever found yourself scribbling scores on a piece of paper or spending precious game time doing math? Say goodbye to the hassle and dive straight into the fun with this innovative score tracking webpage!
 
@@ -18,4 +18,4 @@ Check it out now: https://mazgch.github.io/score/
 
 If you are tired of counting manualy the score during your favourite turn based board game: this simple webpage is your solution. 
 
-[![🎲 Board Game - Score Board 🎲](demo.png)](https://mazgch.github.io/score/)
+[![🎲 Board Game - Scoreboard 🎲](demo.png)](https://mazgch.github.io/score/)
